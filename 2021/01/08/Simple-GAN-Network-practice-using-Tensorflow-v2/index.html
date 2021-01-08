@@ -20,30 +20,38 @@
     var CONFIG = {"hostname":"qiuzhaopeng.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="My Tech Notebook">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Zhaopeng&#39;s Homepage">
-<meta property="og:url" content="http://qiuzhaopeng.github.io/index.html">
+  <meta name="description" content="I have browsed this video on youtube homepage by chance today: https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v&#x3D;yYUN_k36u5Q. This tutorial talks about building a GAN (Generative Adversarial Nets) network using PyTorch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Simple GAN Network practice using Tensorflow v2">
+<meta property="og:url" content="http://qiuzhaopeng.github.io/2021/01/08/Simple-GAN-Network-practice-using-Tensorflow-v2/index.html">
 <meta property="og:site_name" content="Zhaopeng&#39;s Homepage">
-<meta property="og:description" content="My Tech Notebook">
+<meta property="og:description" content="I have browsed this video on youtube homepage by chance today: https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v&#x3D;yYUN_k36u5Q. This tutorial talks about building a GAN (Generative Adversarial Nets) network using PyTorch">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/i/1trq05ce9zr51tsx8znk.png">
+<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/i/ttbm9n9sk9ex9pmidkil.png">
+<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/i/6igys3g2u25ax3g5gice.png">
+<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/i/a5hzr7aya5hgkt7g4iuh.PNG">
+<meta property="article:published_time" content="2021-01-08T12:02:16.000Z">
+<meta property="article:modified_time" content="2021-01-08T12:04:34.136Z">
 <meta property="article:author" content="Zhaopeng QIU">
+<meta property="article:tag" content="python, AI, ML">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dev-to-uploads.s3.amazonaws.com/i/1trq05ce9zr51tsx8znk.png">
 
-<link rel="canonical" href="http://qiuzhaopeng.github.io/">
+<link rel="canonical" href="http://qiuzhaopeng.github.io/2021/01/08/Simple-GAN-Network-practice-using-Tensorflow-v2/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
 
-  <title>Zhaopeng's Homepage</title>
+  <title>Simple GAN Network practice using Tensorflow v2 | Zhaopeng's Homepage</title>
   
 
 
@@ -149,9 +157,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
@@ -167,10 +176,9 @@
       <meta itemprop="name" content="Zhaopeng's Homepage">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/08/Simple-GAN-Network-practice-using-Tensorflow-v2/" class="post-title-link" itemprop="url">Simple GAN Network practice using Tensorflow v2</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          Simple GAN Network practice using Tensorflow v2
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -203,7 +211,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>I have browsed this video on youtube homepage by chance today: <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=yYUN_k36u5Q">https://www.youtube.com/watch?v=yYUN_k36u5Q</a>. This tutorial talks about building a <strong>GAN (Generative Adversarial Nets)</strong> network using <strong>PyTorch</strong> and it is quite interesting and simple. Thus I cloned his <em>github</em> source file and updated it a little bit so that it runs with <strong>Tensorflow 2</strong>. </p>
+        <p>I have browsed this video on youtube homepage by chance today: <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=yYUN_k36u5Q">https://www.youtube.com/watch?v=yYUN_k36u5Q</a>. This tutorial talks about building a <strong>GAN (Generative Adversarial Nets)</strong> network using <strong>PyTorch</strong> and it is quite interesting and simple. Thus I cloned his <em>github</em> source file and updated it a little bit so that it runs with <strong>Tensorflow 2</strong>. </p>
 <p>In this example here in my post, a <em>REAL</em> artist can draw wonderful “paintings” of his own style, which are parabolas that are inside the gray area in figure below and are parallel to the blue and red parabolas.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/1trq05ce9zr51tsx8znk.png" alt="Alt Text"></p>
 <p>Then we introduce a <strong>GAN</strong> network where a generator and a discriminator are defined. The Generator model shall try to simulate the oeuvres of the artist as well as possible. The structure of this <strong>Generator</strong> model is as shown below:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/ttbm9n9sk9ex9pmidkil.png" alt="Alt Text"></p>
 <p>The <strong>Discriminator</strong> model, on contrary, shall do its best to distinguish the generated paintings and the REAL paintings. Its structure is as shown below:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/6igys3g2u25ax3g5gice.png" alt="Alt Text"></p>
@@ -222,169 +230,33 @@
 <p><img src="https://dev-to-uploads.s3.amazonaws.com/i/a5hzr7aya5hgkt7g4iuh.PNG" alt="Alt Text"></p>
 <p>As we can see, as the training steps increases, the “generated paintings” in green becomes more and more real: it becomes quite parallel to upper and lower limit parabolas and stays inside the limits.</p>
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/python-AI-ML/" rel="tag"># python, AI, ML</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/01/08/MapReduce-in-Python/">
+        
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qiu.png">
-      <meta itemprop="name" content="Zhaopeng QIU">
-      <meta itemprop="description" content="My Tech Notebook">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Zhaopeng's Homepage">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/08/MapReduce-in-Python/" class="post-title-link" itemprop="url">MapReduce in Python</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-08 18:25:49 / Modified: 20:04:10" itemprop="dateCreated datePublished" datetime="2021-01-08T18:25:49+08:00">2021-01-08</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/IT-Data/" itemprop="url" rel="index"><span itemprop="name">IT, Data</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Map-Reduce-in-Python"><a href="#Map-Reduce-in-Python" class="headerlink" title="Map / Reduce in Python"></a>Map / Reduce in Python</h1><p>To understand the concept, please refer to this paper of Google: <a target="_blank" rel="noopener" href="http://research.google.com/archive/mapreduce.html">link</a></p>
-<p>In python 2, <code>map()</code> and <code>reduce()</code> are both built-in functions. However, since Python3, <code>reduce()</code> is no longer a built-in function, one should import it from <code>functools</code> module.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/4rs1h2d3ygevfb607m7f.PNG" alt="Alt Text"></p>
-<p><code>map()</code> applies a function to all the items in an input list and returns an iterator object. Such like:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; a = <span class="built_in">map</span>(<span class="keyword">lambda</span> x:x+x, [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>])</span><br><span class="line">&gt;&gt; <span class="built_in">list</span>(a)</span><br><span class="line">Out: [<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">10</span>]</span><br></pre></td></tr></table></figure>
-<p><code>reduce()</code> performs a rolling computation to sequential pairs of values in an input list and returning the result.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/w8c8qt1605q2k71pgg05.png" alt="Alt Text"></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)</span><br></pre></td></tr></table></figure>
-<p>Here is an example written by myself today:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> reduce <span class="comment"># only in Python 3</span></span><br><span class="line"></span><br><span class="line">DIGITS = &#123;<span class="string">&#x27;0&#x27;</span>: <span class="number">0</span>, <span class="string">&#x27;1&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;2&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;3&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;4&#x27;</span>: <span class="number">4</span>, <span class="string">&#x27;5&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;6&#x27;</span>: <span class="number">6</span>, <span class="string">&#x27;7&#x27;</span>: <span class="number">7</span>, <span class="string">&#x27;8&#x27;</span>: <span class="number">8</span>, <span class="string">&#x27;9&#x27;</span>: <span class="number">9</span>,<span class="string">&#x27;.&#x27;</span>: -<span class="number">1</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">char2num</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">return</span> DIGITS[s] </span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">str2float</span>(<span class="params">s</span>):</span> </span><br><span class="line">    L = <span class="built_in">map</span>(char2num, s)</span><br><span class="line">    r = reduce(func,L)</span><br><span class="line">    print(r)</span><br><span class="line">    <span class="keyword">return</span> r[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">x, y</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(x) == <span class="built_in">int</span>:</span><br><span class="line">        <span class="keyword">if</span> x == -<span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span> (<span class="number">0</span> + y, <span class="number">0.1</span>)</span><br><span class="line">        <span class="keyword">elif</span> y == -<span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span>(x, <span class="number">0.1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> (x*<span class="number">10</span>+y, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">elif</span> <span class="built_in">type</span>(x) == <span class="built_in">tuple</span>:</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> y == -<span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span>(x[<span class="number">0</span>], <span class="number">0.1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> x[<span class="number">1</span>]&lt; <span class="number">1</span>:</span><br><span class="line">                res = x[<span class="number">1</span>]*<span class="number">0.1</span></span><br><span class="line">                <span class="keyword">return</span>(x[<span class="number">0</span>]+y*x[<span class="number">1</span>], res)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                res = <span class="number">1</span></span><br><span class="line">                <span class="keyword">return</span>(x[<span class="number">0</span>]*<span class="number">10</span>+y, res)</span><br><span class="line">            </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="comment">#print(&#x27;str2float(\&#x27;123.456\&#x27;) =&#x27;, str2float(&#x27;123.456&#x27;))</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">abs</span>(str2float(<span class="string">&#x27;123.4&#x27;</span>) - <span class="number">123.4</span>) &lt; <span class="number">0.00001</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试成功!&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试失败!&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">abs</span>(str2float(<span class="string">&#x27;123456&#x27;</span>) - <span class="number">123456</span>) &lt; <span class="number">0.00001</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试成功!&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试失败!&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">abs</span>(str2float(<span class="string">&#x27;0.123456&#x27;</span>) - <span class="number">0.123456</span>) &lt; <span class="number">0.00001</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试成功!&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试失败!&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>reference:</p>
-<ol>
-<li><a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/1016959663602400/1017329367486080">https://www.liaoxuefeng.com/wiki/1016959663602400/1017329367486080</a></li>
-<li><a target="_blank" rel="noopener" href="https://book.pythontips.com/en/latest/map_filter.html">https://book.pythontips.com/en/latest/map_filter.html</a></li>
-</ol>
-
-      
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/08/MapReduce-in-Python/" rel="prev" title="MapReduce in Python">
+      <i class="fa fa-chevron-left"></i> MapReduce in Python
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/01/08/Hello-2021/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qiu.png">
-      <meta itemprop="name" content="Zhaopeng QIU">
-      <meta itemprop="description" content="My Tech Notebook">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Zhaopeng's Homepage">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/08/Hello-2021/" class="post-title-link" itemprop="url">Hello 2021</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-08 16:56:36 / Modified: 18:23:36" itemprop="dateCreated datePublished" datetime="2021-01-08T16:56:36+08:00">2021-01-08</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/personal/" itemprop="url" rel="index"><span itemprop="name">personal</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Hello-2021"><a href="#Hello-2021" class="headerlink" title="Hello 2021"></a>Hello 2021</h2><h3 id="Stay-confident-and-keep-fighting"><a href="#Stay-confident-and-keep-fighting" class="headerlink" title="Stay confident and keep fighting"></a>Stay confident and keep fighting</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
   
 
 
