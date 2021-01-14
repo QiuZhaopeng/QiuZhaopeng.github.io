@@ -181,7 +181,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-01-14 12:27:03 / Modified: 12:28:59" itemprop="dateCreated datePublished" datetime="2021-01-14T12:27:03+01:00">2021-01-14</time>
+              <time title="Created: 2021-01-14 12:27:03 / Modified: 12:33:28" itemprop="dateCreated datePublished" datetime="2021-01-14T12:27:03+01:00">2021-01-14</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -205,13 +205,13 @@
 
       
           <p>I am working on migration of our <em>Data Warehouse</em> project from <em>Alibaba Cloud</em> to <em>Huawei Cloud</em> this week. All goes well, except one issue occurs when I tried to connect to <strong>MongoDB</strong> using <strong>MongoDB Compass Community</strong>. </p>
-<p>As I have presented in my <a target="_blank" rel="noopener" href="https://dev.to/jemaloqiu/install-mongodb-with-docker-in-ubuntu-18-04-4pbi">previous post</a>, I have deployed <strong>MongoDB</strong> service using <strong>docker</strong> and I have successfully connected to my <strong>MongoDB</strong> database from <strong>IPython</strong> console. So I firstly tried again the visit from <strong>Ipython</strong> today to make sure that the <strong>MongoDB</strong> service is still running on Huawei ECS. It IS still working well:</p>
+<p>As I have presented in my <a target="_blank" rel="noopener" href="https://dev.to/jemaloqiu/install-mongodb-with-docker-in-ubuntu-18-04-4pbi">previous post</a>, I have deployed <strong>MongoDB</strong> service using <strong>docker</strong> and I have successfully connected to my <strong>MongoDB</strong> database from <strong>IPython</strong> console. So I firstly tried again the visit from <strong>IPython</strong> today to make sure that the <strong>MongoDB</strong> service is still running on Huawei ECS. It IS still working well:</p>
 <p><img src="https://dev-to-uploads.s3.amazonaws.com/i/inkrwaealqvcv183n10a.png" alt="Alt Text"></p>
 <p>Then I open <strong>MongoDB Compass Community</strong> and fill the login information as below (our domain name has not yet been authorized so I have to use Ip address for <em>hostname</em>):<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/e2uyrzwtepgxxkaao9q8.png" alt="Alt Text"><br>However, when I click “CONNECT” button, nothing happens.</p>
 <p>After a close investigation, I found the reason. After I filled all the fields for connection, <strong>Compass</strong> yielded a connection URI string as below.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/iwfcg0mb6hebayyq9lhe.png" alt="Alt Text"></p>
-<p>In fact, as explained in official manual of <strong>MongoDB</strong>, the standard URI syntax for connection is as <code>mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]</code>. Thus in my case, the Compass software has strangely used <code>ip:port</code> as the Database name to visit. Since there is no database with such name, so it shall do nothing and stays in the connection interface.</p>
-<p>Now I correct the URI string manually and fill my database name into this string as below and it works:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/1wez341jzvar701lbflr.png" alt="Alt Text"></p>
-<p>Once I click “CONNECT”, <strong>Compass</strong> jumps to display interface of the queried database now:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/6s8udjmskichqb0ay5id.png" alt="Alt Text"></p>
+<p>In fact, as explained in official manual of <strong>MongoDB</strong>, the standard URI syntax for connection is as:<br><code>mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]</code>.<br>Thus in my case, <strong>MongoDB Compass</strong> has strangely used <code>ip:port</code> as the Database name to visit. Since there is no database with such name, so it shall do nothing and stays in the connection interface.</p>
+<p>Now I correct the URI string manually and fill my database name <em>suppliers</em> into this string as below:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/1wez341jzvar701lbflr.png" alt="Alt Text"></p>
+<p>Once I click “CONNECT”, <strong>Compass</strong> jumps as expected to display interface of the queried database now:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/6s8udjmskichqb0ay5id.png" alt="Alt Text"></p>
 
       
     </div>
