@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"qiuzhaopeng.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Recently in some interview I have been asked about experience of implementing trained tensorflow models in android platform. I have tried one android project cloned from github which embedded a tflite">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Implementation of Tensorflow Lite model on Android">
+<meta property="og:url" content="http://qiuzhaopeng.github.io/2021/02/18/Implementation-of-Tensorflow-Lite-model-on-Android/index.html">
+<meta property="og:site_name" content="Zhaopeng&#39;s Homepage">
+<meta property="og:description" content="Recently in some interview I have been asked about experience of implementing trained tensorflow models in android platform. I have tried one android project cloned from github which embedded a tflite">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/am1dlr3zzlh786d15fn8.jpg">
+<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/b7dylong7y5s6dtsnasn.PNG">
+<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/khmpkno356geyn128vmn.PNG">
+<meta property="article:published_time" content="2021-02-18T22:38:24.000Z">
+<meta property="article:modified_time" content="2021-02-18T22:41:12.263Z">
+<meta property="article:author" content="Zhaopeng QIU">
+<meta property="article:tag" content="AI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/am1dlr3zzlh786d15fn8.jpg">
+
+<link rel="canonical" href="http://qiuzhaopeng.github.io/2021/02/18/Implementation-of-Tensorflow-Lite-model-on-Android/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Implementation of Tensorflow Lite model on Android | Zhaopeng's Homepage</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Zhaopeng's Homepage</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">My tech notebook</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+
+  <a href="https://github.com/QiuZhaopeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/02/18/Implementation-of-Tensorflow-Lite-model-on-Android/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qiu.png">
+      <meta itemprop="name" content="Zhaopeng QIU">
+      <meta itemprop="description" content="Stay hungry, stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhaopeng's Homepage">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Implementation of Tensorflow Lite model on Android
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-02-18 23:38:24 / Modified: 23:41:12" itemprop="dateCreated datePublished" datetime="2021-02-18T23:38:24+01:00">2021-02-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Recently in some interview I have been asked about experience of implementing trained <strong>tensorflow</strong> models in android platform. I have tried one android project cloned from github which embedded a tflite model in it. However, I have not yet tried implementing my own model in an Android application. Thus I did such an exercise today and I successfully made my CNN model work on my Redmi Note 8 pro.</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/am1dlr3zzlh786d15fn8.jpg" alt="Alt Text"></p>
+<h2 id="CNN-model"><a href="#CNN-model" class="headerlink" title="CNN model"></a>CNN model</h2><p>Here is the code for training a <strong>CNN</strong> model with <code>mnist</code> dataset. This model then is converted as <code>tflite</code> model and shall be implemented in <strong>Android</strong> application for recognizing hand-write digits. </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">os.environ[<span class="string">&#x27;TF_CPP_MIN_LOG_LEVEL&#x27;</span>] = <span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow <span class="keyword">import</span> keras</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras <span class="keyword">import</span> datasets, layers, optimizers, Sequential, metrics,models</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()</span><br><span class="line">print(x_train[<span class="number">0</span>,:,:])</span><br><span class="line"><span class="comment">## x_train.shape =&gt; (60000, 28, 28), y_train.shape =&gt; (60000,)</span></span><br><span class="line"><span class="comment">## x_test.shape =&gt; (10000, 28, 28), y_test.shape =&gt; (60000,)</span></span><br><span class="line">x_train = tf.expand_dims(x_train, -<span class="number">1</span>)</span><br><span class="line">x_test = tf.expand_dims(x_test, -<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">yt = tf.squeeze(y_train)  </span><br><span class="line"></span><br><span class="line">y_train = tf.squeeze(y_train)    </span><br><span class="line">y_test = tf.squeeze(y_test)</span><br><span class="line"></span><br><span class="line">print(<span class="string">&quot;Dataset info: &quot;</span>, x_train.shape, y_train.shape, x_test.shape, y_test.shape)</span><br><span class="line"></span><br><span class="line">batch_size = <span class="number">128</span></span><br><span class="line"></span><br><span class="line">train_db = tf.data.Dataset.from_tensor_slices((x_train, y_train))</span><br><span class="line">train_db = train_db.shuffle(<span class="number">10000</span>).batch(batch_size)</span><br><span class="line"></span><br><span class="line">test_db = tf.data.Dataset.from_tensor_slices((x_test, y_test))</span><br><span class="line">test_db = test_db.batch(batch_size)</span><br><span class="line"></span><br><span class="line">train_iter = <span class="built_in">iter</span>(train_db)</span><br><span class="line">sample = <span class="built_in">next</span>(train_iter)</span><br><span class="line">print(sample[<span class="number">0</span>].shape, sample[<span class="number">1</span>].shape)  </span><br><span class="line"></span><br><span class="line"><span class="comment">##  build a standard cnn model</span></span><br><span class="line">model = models.Sequential()</span><br><span class="line">model.add(layers.Conv2D(<span class="number">32</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">&#x27;relu&#x27;</span>, input_shape=(<span class="number">28</span>, <span class="number">28</span>, <span class="number">1</span>)))</span><br><span class="line">model.add(layers.MaxPooling2D((<span class="number">2</span>, <span class="number">2</span>)))</span><br><span class="line">model.add(layers.Conv2D(<span class="number">64</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">&#x27;relu&#x27;</span>))</span><br><span class="line">model.add(layers.MaxPooling2D((<span class="number">2</span>, <span class="number">2</span>)))</span><br><span class="line">model.add(layers.Conv2D(<span class="number">64</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">&#x27;relu&#x27;</span>))</span><br><span class="line"></span><br><span class="line">model.add(layers.Flatten())</span><br><span class="line">model.add(layers.Dense(<span class="number">64</span>, activation=<span class="string">&#x27;relu&#x27;</span>))</span><br><span class="line">model.add(layers.Dense(<span class="number">10</span>))</span><br><span class="line"></span><br><span class="line">model.summary()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">model.<span class="built_in">compile</span>(optimizer=<span class="string">&#x27;adam&#x27;</span>,</span><br><span class="line">              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=<span class="literal">True</span>),</span><br><span class="line">             metrics=[<span class="string">&#x27;accuracy&#x27;</span>])</span><br><span class="line"></span><br><span class="line">train_history = model.fit(train_db, epochs=<span class="number">10</span>,          validation_data=test_db)</span><br><span class="line"></span><br><span class="line"><span class="comment">## once the model has been trained, convert it to tflite model</span></span><br><span class="line">converter = tf.lite.TFLiteConverter.from_keras_model(model)</span><br><span class="line">tflite_model = converter.convert()</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;qiu_mnist_model.tflite&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(tflite_model)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="Implementation-in-Android-app"><a href="#Implementation-in-Android-app" class="headerlink" title="Implementation in Android app"></a>Implementation in Android app</h2><p>I refereed to <a target="_blank" rel="noopener" href="https://margaretmz.medium.com/e2e-tfkeras-tflite-android-273acde6588">this post</a> for obtaining the original android project. I imported the kotlin version into my <strong>Android Studio</strong>. However, there were some bugs initially when I loaded my model into it. </p>
+<p>My own model is located to <code>asset</code> repository:<br><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/b7dylong7y5s6dtsnasn.PNG" alt="Alt Text"></p>
+<p>The most important thing for this work is the following Gradle setting:<br><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/khmpkno356geyn128vmn.PNG" alt="Alt Text"></p>
+<p>After about 15min of debugging and code modifications, I successfully made my model work. </p>
+<p>Check out the video (there is still accuracy issue):</p>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/yIQ6RJx90yM" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
+
+<p>I will upload the android project src code to my github repo once I finish cleaning the code and improve the performance.</p>
+<h6 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h6><ol>
+<li><p><a target="_blank" rel="noopener" href="https://www.tensorflow.org/lite/performance/post_training_quantization">https://www.tensorflow.org/lite/performance/post_training_quantization</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://margaretmz.medium.com/e2e-tfkeras-tflite-android-273acde6588">https://margaretmz.medium.com/e2e-tfkeras-tflite-android-273acde6588</a></p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/03/MQTT-communication-via-Cloud-Broker/" rel="prev" title="MQTT communication via Cloud Broker">
+      <i class="fa fa-chevron-left"></i> MQTT communication via Cloud Broker
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CNN-model"><span class="nav-number">1.</span> <span class="nav-text">CNN model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Implementation-in-Android-app"><span class="nav-number">2.</span> <span class="nav-text">Implementation in Android app</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#reference"><span class="nav-number">2.0.0.0.1.</span> <span class="nav-text">reference</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zhaopeng QIU"
+      src="/images/qiu.png">
+  <p class="site-author-name" itemprop="name">Zhaopeng QIU</p>
+  <div class="site-description" itemprop="description">Stay hungry, stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhaopeng QIU</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

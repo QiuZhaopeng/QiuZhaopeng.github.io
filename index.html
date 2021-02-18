@@ -156,6 +156,91 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/02/18/Implementation-of-Tensorflow-Lite-model-on-Android/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qiu.png">
+      <meta itemprop="name" content="Zhaopeng QIU">
+      <meta itemprop="description" content="Stay hungry, stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhaopeng's Homepage">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/18/Implementation-of-Tensorflow-Lite-model-on-Android/" class="post-title-link" itemprop="url">Implementation of Tensorflow Lite model on Android</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-02-18 23:38:24 / Modified: 23:41:12" itemprop="dateCreated datePublished" datetime="2021-02-18T23:38:24+01:00">2021-02-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Recently in some interview I have been asked about experience of implementing trained <strong>tensorflow</strong> models in android platform. I have tried one android project cloned from github which embedded a tflite model in it. However, I have not yet tried implementing my own model in an Android application. Thus I did such an exercise today and I successfully made my CNN model work on my Redmi Note 8 pro.</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/am1dlr3zzlh786d15fn8.jpg" alt="Alt Text"></p>
+<h2 id="CNN-model"><a href="#CNN-model" class="headerlink" title="CNN model"></a>CNN model</h2><p>Here is the code for training a <strong>CNN</strong> model with <code>mnist</code> dataset. This model then is converted as <code>tflite</code> model and shall be implemented in <strong>Android</strong> application for recognizing hand-write digits. </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">os.environ[<span class="string">&#x27;TF_CPP_MIN_LOG_LEVEL&#x27;</span>] = <span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow <span class="keyword">import</span> keras</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras <span class="keyword">import</span> datasets, layers, optimizers, Sequential, metrics,models</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()</span><br><span class="line">print(x_train[<span class="number">0</span>,:,:])</span><br><span class="line"><span class="comment">## x_train.shape =&gt; (60000, 28, 28), y_train.shape =&gt; (60000,)</span></span><br><span class="line"><span class="comment">## x_test.shape =&gt; (10000, 28, 28), y_test.shape =&gt; (60000,)</span></span><br><span class="line">x_train = tf.expand_dims(x_train, -<span class="number">1</span>)</span><br><span class="line">x_test = tf.expand_dims(x_test, -<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">yt = tf.squeeze(y_train)  </span><br><span class="line"></span><br><span class="line">y_train = tf.squeeze(y_train)    </span><br><span class="line">y_test = tf.squeeze(y_test)</span><br><span class="line"></span><br><span class="line">print(<span class="string">&quot;Dataset info: &quot;</span>, x_train.shape, y_train.shape, x_test.shape, y_test.shape)</span><br><span class="line"></span><br><span class="line">batch_size = <span class="number">128</span></span><br><span class="line"></span><br><span class="line">train_db = tf.data.Dataset.from_tensor_slices((x_train, y_train))</span><br><span class="line">train_db = train_db.shuffle(<span class="number">10000</span>).batch(batch_size)</span><br><span class="line"></span><br><span class="line">test_db = tf.data.Dataset.from_tensor_slices((x_test, y_test))</span><br><span class="line">test_db = test_db.batch(batch_size)</span><br><span class="line"></span><br><span class="line">train_iter = <span class="built_in">iter</span>(train_db)</span><br><span class="line">sample = <span class="built_in">next</span>(train_iter)</span><br><span class="line">print(sample[<span class="number">0</span>].shape, sample[<span class="number">1</span>].shape)  </span><br><span class="line"></span><br><span class="line"><span class="comment">##  build a standard cnn model</span></span><br><span class="line">model = models.Sequential()</span><br><span class="line">model.add(layers.Conv2D(<span class="number">32</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">&#x27;relu&#x27;</span>, input_shape=(<span class="number">28</span>, <span class="number">28</span>, <span class="number">1</span>)))</span><br><span class="line">model.add(layers.MaxPooling2D((<span class="number">2</span>, <span class="number">2</span>)))</span><br><span class="line">model.add(layers.Conv2D(<span class="number">64</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">&#x27;relu&#x27;</span>))</span><br><span class="line">model.add(layers.MaxPooling2D((<span class="number">2</span>, <span class="number">2</span>)))</span><br><span class="line">model.add(layers.Conv2D(<span class="number">64</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">&#x27;relu&#x27;</span>))</span><br><span class="line"></span><br><span class="line">model.add(layers.Flatten())</span><br><span class="line">model.add(layers.Dense(<span class="number">64</span>, activation=<span class="string">&#x27;relu&#x27;</span>))</span><br><span class="line">model.add(layers.Dense(<span class="number">10</span>))</span><br><span class="line"></span><br><span class="line">model.summary()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">model.<span class="built_in">compile</span>(optimizer=<span class="string">&#x27;adam&#x27;</span>,</span><br><span class="line">              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=<span class="literal">True</span>),</span><br><span class="line">             metrics=[<span class="string">&#x27;accuracy&#x27;</span>])</span><br><span class="line"></span><br><span class="line">train_history = model.fit(train_db, epochs=<span class="number">10</span>,          validation_data=test_db)</span><br><span class="line"></span><br><span class="line"><span class="comment">## once the model has been trained, convert it to tflite model</span></span><br><span class="line">converter = tf.lite.TFLiteConverter.from_keras_model(model)</span><br><span class="line">tflite_model = converter.convert()</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;qiu_mnist_model.tflite&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(tflite_model)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="Implementation-in-Android-app"><a href="#Implementation-in-Android-app" class="headerlink" title="Implementation in Android app"></a>Implementation in Android app</h2><p>I refereed to <a target="_blank" rel="noopener" href="https://margaretmz.medium.com/e2e-tfkeras-tflite-android-273acde6588">this post</a> for obtaining the original android project. I imported the kotlin version into my <strong>Android Studio</strong>. However, there were some bugs initially when I loaded my model into it. </p>
+<p>My own model is located to <code>asset</code> repository:<br><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/b7dylong7y5s6dtsnasn.PNG" alt="Alt Text"></p>
+<p>The most important thing for this work is the following Gradle setting:<br><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/khmpkno356geyn128vmn.PNG" alt="Alt Text"></p>
+<p>After about 15min of debugging and code modifications, I successfully made my model work. </p>
+<p>Check out the video (there is still accuracy issue):</p>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/yIQ6RJx90yM" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
+
+<p>I will upload the android project src code to my github repo once I finish cleaning the code and improve the performance.</p>
+<h6 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h6><ol>
+<li><p><a target="_blank" rel="noopener" href="https://www.tensorflow.org/lite/performance/post_training_quantization">https://www.tensorflow.org/lite/performance/post_training_quantization</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://margaretmz.medium.com/e2e-tfkeras-tflite-android-273acde6588">https://margaretmz.medium.com/e2e-tfkeras-tflite-android-273acde6588</a></p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/02/03/MQTT-communication-via-Cloud-Broker/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -888,87 +973,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/01/08/MapReduce-in-Python/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qiu.png">
-      <meta itemprop="name" content="Zhaopeng QIU">
-      <meta itemprop="description" content="Stay hungry, stay foolish">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Zhaopeng's Homepage">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/08/MapReduce-in-Python/" class="post-title-link" itemprop="url">MapReduce in Python</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-08 11:25:49 / Modified: 15:02:44" itemprop="dateCreated datePublished" datetime="2021-01-08T11:25:49+01:00">2021-01-08</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Data/" itemprop="url" rel="index"><span itemprop="name">Data</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Map-Reduce-in-Python"><a href="#Map-Reduce-in-Python" class="headerlink" title="Map / Reduce in Python"></a>Map / Reduce in Python</h1><p>To understand the concept, please refer to this paper of Google: <a target="_blank" rel="noopener" href="http://research.google.com/archive/mapreduce.html">link</a></p>
-<p>In python 2, <code>map()</code> and <code>reduce()</code> are both built-in functions. However, since Python3, <code>reduce()</code> is no longer a built-in function, one should import it from <code>functools</code> module.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/4rs1h2d3ygevfb607m7f.PNG" alt="Alt Text"></p>
-<p><code>map()</code> applies a function to all the items in an input list and returns an iterator object. Such like:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; a = <span class="built_in">map</span>(<span class="keyword">lambda</span> x:x+x, [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>])</span><br><span class="line">&gt;&gt; <span class="built_in">list</span>(a)</span><br><span class="line">Out: [<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">10</span>]</span><br></pre></td></tr></table></figure>
-<p><code>reduce()</code> performs a rolling computation to sequential pairs of values in an input list and returning the result.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/w8c8qt1605q2k71pgg05.png" alt="Alt Text"></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)</span><br></pre></td></tr></table></figure>
-<p>Here is an example written by myself today:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> reduce <span class="comment"># only in Python 3</span></span><br><span class="line"></span><br><span class="line">DIGITS = &#123;<span class="string">&#x27;0&#x27;</span>: <span class="number">0</span>, <span class="string">&#x27;1&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;2&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;3&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;4&#x27;</span>: <span class="number">4</span>, <span class="string">&#x27;5&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;6&#x27;</span>: <span class="number">6</span>, <span class="string">&#x27;7&#x27;</span>: <span class="number">7</span>, <span class="string">&#x27;8&#x27;</span>: <span class="number">8</span>, <span class="string">&#x27;9&#x27;</span>: <span class="number">9</span>,<span class="string">&#x27;.&#x27;</span>: -<span class="number">1</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">char2num</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">return</span> DIGITS[s] </span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">str2float</span>(<span class="params">s</span>):</span> </span><br><span class="line">    L = <span class="built_in">map</span>(char2num, s)</span><br><span class="line">    r = reduce(func,L)</span><br><span class="line">    print(r)</span><br><span class="line">    <span class="keyword">return</span> r[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">x, y</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(x) == <span class="built_in">int</span>:</span><br><span class="line">        <span class="keyword">if</span> x == -<span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span> (<span class="number">0</span> + y, <span class="number">0.1</span>)</span><br><span class="line">        <span class="keyword">elif</span> y == -<span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span>(x, <span class="number">0.1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> (x*<span class="number">10</span>+y, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">elif</span> <span class="built_in">type</span>(x) == <span class="built_in">tuple</span>:</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> y == -<span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span>(x[<span class="number">0</span>], <span class="number">0.1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> x[<span class="number">1</span>]&lt; <span class="number">1</span>:</span><br><span class="line">                res = x[<span class="number">1</span>]*<span class="number">0.1</span></span><br><span class="line">                <span class="keyword">return</span>(x[<span class="number">0</span>]+y*x[<span class="number">1</span>], res)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                res = <span class="number">1</span></span><br><span class="line">                <span class="keyword">return</span>(x[<span class="number">0</span>]*<span class="number">10</span>+y, res)</span><br><span class="line">            </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="comment">#print(&#x27;str2float(\&#x27;123.456\&#x27;) =&#x27;, str2float(&#x27;123.456&#x27;))</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">abs</span>(str2float(<span class="string">&#x27;123.4&#x27;</span>) - <span class="number">123.4</span>) &lt; <span class="number">0.00001</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试成功!&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试失败!&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">abs</span>(str2float(<span class="string">&#x27;123456&#x27;</span>) - <span class="number">123456</span>) &lt; <span class="number">0.00001</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试成功!&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试失败!&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">abs</span>(str2float(<span class="string">&#x27;0.123456&#x27;</span>) - <span class="number">0.123456</span>) &lt; <span class="number">0.00001</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试成功!&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&#x27;测试失败!&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>reference:</p>
-<ol>
-<li><a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/1016959663602400/1017329367486080">https://www.liaoxuefeng.com/wiki/1016959663602400/1017329367486080</a></li>
-<li><a target="_blank" rel="noopener" href="https://book.pythontips.com/en/latest/map_filter.html">https://book.pythontips.com/en/latest/map_filter.html</a></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1040,7 +1044,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
