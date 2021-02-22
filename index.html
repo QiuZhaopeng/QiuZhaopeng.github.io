@@ -156,6 +156,93 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/02/23/Binary-search-algorithm-illustration/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qiu.png">
+      <meta itemprop="name" content="Zhaopeng QIU">
+      <meta itemprop="description" content="Stay hungry, stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhaopeng's Homepage">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/23/Binary-search-algorithm-illustration/" class="post-title-link" itemprop="url">Binary search algorithm illustration</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-02-23 00:20:01 / Modified: 00:21:11" itemprop="dateCreated datePublished" datetime="2021-02-23T00:20:01+01:00">2021-02-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CS/" itemprop="url" rel="index"><span itemprop="name">CS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>“A picture is worth a thousand words”</p>
+</blockquote>
+<p>In order to explain to a friend how <strong>Binary search algorithm</strong> works, I drew several pictures to show solution of a simple problem using this algorithm. Here I would like to share it in this post. </p>
+<p>As shown in the figure below, we are given a sorted array <strong>v</strong> = [1, 2, 3, 4, 5, 7, 9, 10, 12, 17], and we want to find index of the target number 9. One can see easily that the answer should be 6 (suppose index of the first element is 0).</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/7ku0opzveuhu22j1jel8.PNG" alt="Alt Text"></p>
+<h2 id="Binary-search-algorithm-illustration"><a href="#Binary-search-algorithm-illustration" class="headerlink" title="Binary search algorithm illustration"></a>Binary search algorithm illustration</h2><p>In <strong>Binary search algorithm</strong>, we define three pointers to elements: <code>l</code>, <code>r</code> and <code>mid</code>. They point respectively to the lower (left) bound index, the upper (right) bound index and the middle index of the range for searching. We calculate <code>mid</code> as <code>mid = l + (r-l)/2</code>.</p>
+<p>Initially, we search the entire array. So <code>l</code> = 0, <code>r</code> = 9 and <code>mid</code> = 4. Here is the first step:</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ch8p4qfojxbbtn1i1t6d.PNG" alt="Alt Text"></p>
+<p>The element pointed by <code>mid</code> is 5 and it is smaller than our target number 9. So we narrow down the searching range to the right half of the array:  <code>l</code> = <code>mid</code>+1 = 5, <code>r</code> = 9 and <code>mid</code> is updated 7:</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ex6o0oh656j6q450f2x7.PNG" alt="Alt Text"></p>
+<p>Now the element pointed by <code>mid</code> is 10 and it is larger than our target number 9. So we narrow down again the searching range to its left half. </p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ci3m99kjafl12s5n7pg8.PNG" alt="Alt Text"></p>
+<p>We repeat the same steps until the element pointed by <code>mid</code> is equal to the target number 9. See, we find out the index of number 9 in this array is 6.<br><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/wfihxwdc78nlntqrxix7.PNG" alt="Alt Text"></p>
+<h2 id="Binary-search-algorithm-code"><a href="#Binary-search-algorithm-code" class="headerlink" title="Binary search algorithm code"></a>Binary search algorithm code</h2><p>Below is the c++ code for this algorithm:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* Binary search </span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">binSearch</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; <span class="built_in">array</span>, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>, r = <span class="built_in">array</span>.size()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span> (l&lt;=r)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> mid = l + (r-l)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">array</span>[mid] == target)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">array</span>[mid] &gt; target)</span><br><span class="line">        &#123;</span><br><span class="line">            r = mid<span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            l = mid+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>I put all the steps of this example in one figure to demonstrate overview of the <strong>Binary search algorithm</strong>:</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/gqm65k7cruocxc0kxcxu.png" alt="image"></p>
+<h2 id="A-similar-problem"><a href="#A-similar-problem" class="headerlink" title="A similar problem"></a>A similar problem</h2><p>Here is a similar problem which can also be solved by varying a little the <strong>Binary search algorithm</strong>: in a sorted array with repeated elements, we would like to find index of the first occurrence of the target number. One can think of the solution. I will present the solution using figures in my next post. </p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/nyojhta92zf86jgqaci2.PNG" alt="Alt Text"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/02/18/Implementation-of-Tensorflow-Lite-model-on-Android/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -888,91 +975,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/01/08/Simple-GAN-Network-practice-using-Tensorflow-v2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qiu.png">
-      <meta itemprop="name" content="Zhaopeng QIU">
-      <meta itemprop="description" content="Stay hungry, stay foolish">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Zhaopeng's Homepage">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/08/Simple-GAN-Network-practice-using-Tensorflow-v2/" class="post-title-link" itemprop="url">Simple GAN Network practice using Tensorflow v2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-08 13:02:16 / Modified: 15:01:54" itemprop="dateCreated datePublished" datetime="2021-01-08T13:02:16+01:00">2021-01-08</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>I have browsed this video on youtube homepage by chance today: <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=yYUN_k36u5Q">https://www.youtube.com/watch?v=yYUN_k36u5Q</a>. This tutorial talks about building a <strong>GAN (Generative Adversarial Nets)</strong> network using <strong>PyTorch</strong> and it is quite interesting and simple. Thus I cloned his <em>github</em> source file and updated it a little bit so that it runs with <strong>Tensorflow 2</strong>. </p>
-<p>In this example here in my post, a <em>REAL</em> artist can draw wonderful “paintings” of his own style, which are parabolas that are inside the gray area in figure below and are parallel to the blue and red parabolas.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/1trq05ce9zr51tsx8znk.png" alt="Alt Text"></p>
-<p>Then we introduce a <strong>GAN</strong> network where a generator and a discriminator are defined. The Generator model shall try to simulate the oeuvres of the artist as well as possible. The structure of this <strong>Generator</strong> model is as shown below:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/ttbm9n9sk9ex9pmidkil.png" alt="Alt Text"></p>
-<p>The <strong>Discriminator</strong> model, on contrary, shall do its best to distinguish the generated paintings and the REAL paintings. Its structure is as shown below:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/6igys3g2u25ax3g5gice.png" alt="Alt Text"></p>
-<p>Now let’s begin to code.</p>
-<p>Firstly the dependencies. One should have <strong>tensorflow 2</strong>, <strong>numpy</strong> and <strong>matplotlib</strong> installed.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line">os.environ[<span class="string">&#x27;TF_CPP_MIN_LOG_LEVEL&#x27;</span>] = <span class="string">&quot;2&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf2</span><br><span class="line"><span class="keyword">import</span> tensorflow.keras <span class="keyword">as</span> keras</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">from</span> tensorflow.keras.layers <span class="keyword">import</span> Dense, Activation</span><br><span class="line"><span class="keyword">import</span> tensorflow.keras.backend <span class="keyword">as</span> K</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">print(<span class="string">&quot;TF version: &quot;</span>, tf2.__version__)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>Some important hyper parameters.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Hyper Parameters</span></span><br><span class="line">BATCH_SIZE = <span class="number">32</span></span><br><span class="line">LR_G = <span class="number">0.0001</span>           <span class="comment"># learning rate for generator</span></span><br><span class="line">LR_D = <span class="number">0.0001</span>           <span class="comment"># learning rate for discriminator</span></span><br><span class="line">N_IDEAS = <span class="number">5</span>             <span class="comment"># think of this as number of ideas for generating an art work (Generator)</span></span><br><span class="line">ART_COMPONENTS = <span class="number">15</span>     <span class="comment"># it could be total point G can draw in the canvas</span></span><br><span class="line">PAINT_POINTS = np.vstack([np.linspace(-<span class="number">1</span>, <span class="number">1</span>, ART_COMPONENTS) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(BATCH_SIZE)])</span><br></pre></td></tr></table></figure>
-<p>This function will return painting works of the real artist:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment"># return painting of the famous artist (real target)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">artist_works</span>():</span>    </span><br><span class="line">    a = np.random.uniform(<span class="number">1</span>, <span class="number">2</span>, size=BATCH_SIZE)[:, np.newaxis]</span><br><span class="line">    paintings = a * np.power(PAINT_POINTS, <span class="number">2</span>) + (a-<span class="number">1</span>)</span><br><span class="line">    <span class="comment"># print(&quot;Shape of paitings: &quot;, paintings.shape)</span></span><br><span class="line">    <span class="keyword">return</span> paintings</span><br></pre></td></tr></table></figure>
-<p>Now the models as well as their optimizers.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">model_G = Sequential([</span><br><span class="line">    Dense(<span class="number">128</span>, activation=<span class="string">&quot;relu&quot;</span>,input_shape=(<span class="literal">None</span>, N_IDEAS)), </span><br><span class="line">    Dense(ART_COMPONENTS)</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">model_D = Sequential([</span><br><span class="line">    Dense(<span class="number">128</span>, activation=<span class="string">&quot;relu&quot;</span>, input_shape=(<span class="literal">None</span>, ART_COMPONENTS)),  </span><br><span class="line">    Dense(<span class="number">1</span>, activation=<span class="string">&quot;sigmoid&quot;</span>),</span><br><span class="line">    ])</span><br><span class="line"></span><br><span class="line">opt_D = keras.optimizers.Adam(model_D.variables, lr=LR_D)</span><br><span class="line">opt_G = keras.optimizers.Adam(model_G.variables, lr=LR_G)</span><br></pre></td></tr></table></figure>
-<p>Finally the training part and the plot stuffs. </p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">          </span><br><span class="line">plt.ion()   <span class="comment"># something about continuous plotting</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> step <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10000</span>):</span><br><span class="line">    artist_paintings = artist_works()  <span class="comment"># real painting from artist</span></span><br><span class="line">    G_ideas = np.random.randn(BATCH_SIZE, N_IDEAS)</span><br><span class="line">    <span class="keyword">with</span> tf2.GradientTape(persistent=<span class="literal">True</span>) <span class="keyword">as</span> tape:</span><br><span class="line">        G_paintings = model_G(G_ideas)                    <span class="comment"># fake painting from model G (random ideas)</span></span><br><span class="line">        prob_artist1 = model_D(G_paintings)               <span class="comment"># model D computes the prob for assessing if G_paintings are real</span></span><br><span class="line">        G_loss = K.mean(K.log(<span class="number">1.</span> - prob_artist1))         <span class="comment"># loss function of G model</span></span><br><span class="line"></span><br><span class="line">     </span><br><span class="line">        prob_artist0 = model_D(artist_paintings)          <span class="comment"># D try to increase this prob for real paitings</span></span><br><span class="line">        prob_artist1 = model_D(G_paintings)  <span class="comment"># D try to reduce this prob for generated paitings</span></span><br><span class="line">        D_loss = - K.mean(K.log(prob_artist0) + K.log(<span class="number">1.</span> - prob_artist1))                               <span class="comment"># loss function of G model</span></span><br><span class="line">    </span><br><span class="line">    L_gradx = tape.gradient(G_loss, model_G.variables)   </span><br><span class="line">    opt_G.apply_gradients(grads_and_vars=<span class="built_in">zip</span>(L_gradx, model_G.variables))</span><br><span class="line">    </span><br><span class="line">    L_gradx2 = tape.gradient(D_loss, model_D.variables) </span><br><span class="line">    opt_D.apply_gradients(grads_and_vars=<span class="built_in">zip</span>(L_gradx2, model_D.variables))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> step % <span class="number">50</span> == <span class="number">0</span>:  <span class="comment"># plotting</span></span><br><span class="line">        plt.cla()</span><br><span class="line">        plt.plot(PAINT_POINTS[<span class="number">0</span>], G_paintings[<span class="number">0</span>], c=<span class="string">&#x27;#4AD631&#x27;</span>, lw=<span class="number">3</span>, label=<span class="string">&#x27;Generated painting&#x27;</span>,)</span><br><span class="line">        plt.plot(PAINT_POINTS[<span class="number">0</span>], <span class="number">2</span> * np.power(PAINT_POINTS[<span class="number">0</span>], <span class="number">2</span>) + <span class="number">1</span>, c=<span class="string">&#x27;#74BCFF&#x27;</span>, lw=<span class="number">3</span>, label=<span class="string">&#x27;upper bound&#x27;</span>)</span><br><span class="line">        plt.plot(PAINT_POINTS[<span class="number">0</span>], <span class="number">1</span> * np.power(PAINT_POINTS[<span class="number">0</span>], <span class="number">2</span>) + <span class="number">0</span>, c=<span class="string">&#x27;#FF9359&#x27;</span>, lw=<span class="number">3</span>, label=<span class="string">&#x27;lower bound&#x27;</span>)</span><br><span class="line">        plt.text(-<span class="number">.5</span>, <span class="number">2.3</span>, <span class="string">&#x27;D accuracy=%.2f (0.5 for D to converge)&#x27;</span> % K.mean(prob_artist0), fontdict=&#123;<span class="string">&#x27;size&#x27;</span>: <span class="number">13</span>&#125;)</span><br><span class="line">        plt.text(-<span class="number">.5</span>, <span class="number">2</span>, <span class="string">&#x27;D score= %.2f (-1.38 for G to converge)&#x27;</span> % -D_loss, fontdict=&#123;<span class="string">&#x27;size&#x27;</span>: <span class="number">13</span>&#125;)</span><br><span class="line">        plt.ylim((<span class="number">0</span>, <span class="number">3</span>));plt.legend(loc=<span class="string">&#x27;upper right&#x27;</span>, fontsize=<span class="number">10</span>);plt.draw();plt.pause(<span class="number">0.01</span>)</span><br><span class="line">        print(<span class="string">&quot;Current step: &#123;&#125;&quot;</span>.<span class="built_in">format</span>(step))</span><br><span class="line">plt.ioff()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
-<p>See how the simulated painting evolves:</p>
-<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/a5hzr7aya5hgkt7g4iuh.PNG" alt="Alt Text"></p>
-<p>As we can see, as the training steps increases, the “generated paintings” in green becomes more and more real: it becomes quite parallel to upper and lower limit parabolas and stays inside the limits.</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1044,20 +1046,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
