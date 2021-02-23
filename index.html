@@ -156,6 +156,89 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/02/23/Binary-search-algorithm-illustration%EF%BC%882%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qiu.png">
+      <meta itemprop="name" content="Zhaopeng QIU">
+      <meta itemprop="description" content="Stay hungry, stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhaopeng's Homepage">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/23/Binary-search-algorithm-illustration%EF%BC%882%EF%BC%89/" class="post-title-link" itemprop="url">Binary search algorithm illustration（2）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-02-23 16:09:54" itemprop="dateCreated datePublished" datetime="2021-02-23T16:09:54+01:00">2021-02-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-02-24 00:39:01" itemprop="dateModified" datetime="2021-02-24T00:39:01+01:00">2021-02-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CS/" itemprop="url" rel="index"><span itemprop="name">CS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Following <a target="_blank" rel="noopener" href="https://dev.to/jemaloqiu/binary-search-algorithm-illustration-1eaj">previous post</a>, I would like to illustrate the solution of the following problem (figure below) using <strong>Binary search algorithm</strong>.<br><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ttgsxr0iewkbpazpmlf9.PNG" alt="Alt Text"><br>As shown in the figure above, we are given a sorted array <strong>v</strong> =  [2, 2, 2, 3, 3, 4, 5, 6, 6, 7] with repeated numbers, and we want to find the index of the first occurrence of target number 3. It’s easy for human to find that the answer should be 3 (we suppose index of the first element is 0). How for computers?</p>
+<h2 id="Algorithm-illustration"><a href="#Algorithm-illustration" class="headerlink" title="Algorithm illustration"></a>Algorithm illustration</h2><p>As usual, we define three pointers: <code>l</code>, <code>r</code> and <code>mid</code>. They point respectively to the lower (left) bound index, the upper (right) bound index and the middle index of the searching range. We calculate <code>mid</code> as <code>mid = l + (r-l)/2</code>.</p>
+<p>Initially, we search the entire array. So <code>l</code> = 0, <code>r</code> = 9 and <code>mid</code> = 4. Here is the first step:<br><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rutkm8mxo13137udql0q.png" alt="image"><br>Though <code>mid</code> points already to element whose value is equal to 3, we cannot stop searching since we are not sure if its the first occurrence in the array. So we continue to search by changing <code>r</code> to current value of <code>mid</code>. So we narrow down the searching range to the left half of the array:  <code>l</code> = 0, <code>r</code> = 4 and <code>mid</code> is updated to 2:</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/scccki7gej68rjhmh0r9.PNG" alt="Alt Text"></p>
+<p>Now the element pointed by <code>mid</code> is 2 and it is smaller than our target number 3. So we narrow down again the searching range to the right half of current searching range. Now  <code>l</code> = 3, <code>r</code> = 4 and <code>mid</code> is updated to 3:</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/tnbjhphhej20bbasgcwv.PNG" alt="Alt Text"></p>
+<p>Now the element pointed by <code>mid</code> is 3 and it is equal to the target number 3. We now move <code>r</code> to current <code>mid</code>. So <code>l</code> = <code>r</code> =  <code>mid</code> = 3. Solution found!</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/asay6bqrh7pgbw869jpf.PNG" alt="Alt Text"></p>
+<h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>I put all the steps of this example in one figure to demonstrate overview of the solution:</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/dwvrwrr9cce49i1y0t16.PNG" alt="Alt Text"></p>
+<h2 id="C-Code"><a href="#C-Code" class="headerlink" title="C++ Code"></a>C++ Code</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* First occurency search </span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">foSearch</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; <span class="built_in">array</span>, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>, r = <span class="built_in">array</span>.size()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span> (l&lt;r)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> mid = l + (r-l)/<span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">array</span>[mid] &gt; target)</span><br><span class="line">        &#123;</span><br><span class="line">            r = mid<span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(<span class="built_in">array</span>[mid] == target)</span><br><span class="line">        &#123;</span><br><span class="line">            r = mid;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            l = mid+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;l=&quot;</span> &lt;&lt; l &lt;&lt;  <span class="string">&quot;, r=&quot;</span> &lt;&lt; r &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">int</span> res = <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">array</span>[l] == target)</span><br><span class="line">    &#123;</span><br><span class="line">        res = l;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> res;  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;   </span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; vec &#123;<span class="number">1</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">4</span>,<span class="number">9</span>, <span class="number">9</span>,<span class="number">12</span>,<span class="number">12</span>, <span class="number">12</span>,<span class="number">32</span>,<span class="number">43</span>, <span class="number">43</span>,<span class="number">43</span>, <span class="number">55</span>, <span class="number">55</span>, <span class="number">63</span>, <span class="number">77</span>, <span class="number">77</span>, <span class="number">98</span>, <span class="number">98</span>, <span class="number">98</span>, <span class="number">100</span>&#125;;</span><br><span class="line">    <span class="keyword">int</span> ans = foSearch(vec, <span class="number">43</span>);</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;ans is : &quot;</span> &lt;&lt; ans &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;value is : &quot;</span> &lt;&lt; vec[ans] &lt;&lt; <span class="built_in">endl</span>;  </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/02/23/Binary-search-algorithm-illustration/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -898,83 +981,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/01/10/Julia-Tutorial-1-Context-and-basics/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qiu.png">
-      <meta itemprop="name" content="Zhaopeng QIU">
-      <meta itemprop="description" content="Stay hungry, stay foolish">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Zhaopeng's Homepage">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/10/Julia-Tutorial-1-Context-and-basics/" class="post-title-link" itemprop="url">Julia Tutorial - 1: Context and basics</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-10 17:05:13 / Modified: 17:36:11" itemprop="dateCreated datePublished" datetime="2021-01-10T17:05:13+01:00">2021-01-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Data/" itemprop="url" rel="index"><span itemprop="name">Data</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Context"><a href="#Context" class="headerlink" title="Context"></a>Context</h2><p>A super fan of <strong>Matlab</strong>, I’ve used it (mainly the <em>Optimization</em> toolbox) a lot during my PhD study. Later on, after I started my professional job in <em>INRIA</em> and <em>GE</em>, I used mainly <strong>C++/C/C#/Python</strong> but rarely <em>Matlab</em>. Though <em>Matlab</em> is great, it is, however, too expensive for personal users. That’s why I use often open-source tools such like <strong>Numpy</strong>, <strong>Scipy</strong>, <strong>Eigen</strong> and <strong>Maxima</strong> in some math-related development works.</p>
-<p>I heard the name of <strong>Julia</strong> in 2017. I felt astonished to learn that this new language combines the interactivity and computational power of Python/Matlab with the speed of C. It is until winter of 2020 that I have time to learn intensively this powerful and promising language. So I would like to share my learning notes here. Stay hungry!</p>
-<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/fth0mf5mdu9en2ayl7ky.png" alt="Alt Text"></p>
-<h2 id="Numbers"><a href="#Numbers" class="headerlink" title="Numbers"></a>Numbers</h2><p>For <code>Number</code> type of <strong>Julia</strong>, this table in figure below presents the common basic types:<br> <img src="https://dev-to-uploads.s3.amazonaws.com/i/ul5g1apbhlt8sgzmhh56.PNG" alt="Alt Text"></p>
-<p>I have made a “Knowldge graph” of all data types in <strong>Julia</strong> and their relations. Below is a chart of all types (nodes) that are related to <code>Number</code>type:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/q3q6zwuwsb2scw9winyf.PNG" alt="Alt Text"></p>
-<p>My exercise code </p>
-<figure class="highlight julia"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#     one &#x27;#&#x27; symbole for a one-line comment, equal to // in C/C++</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#=    &#x27;#=&#x27; + &#x27;=#</span>&#x27; pair <span class="keyword">for</span> multi-line comment</span><br><span class="line">      similar to &#x27;/*<span class="string">&#x27;+&#x27;</span>*/&#x27; pair <span class="keyword">in</span> C/C++</span><br><span class="line">=<span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## as in java, println(xxx) is equivalent to print(xxx + &#x27;\n&#x27;)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">########   day 1:   Numbers</span></span><br><span class="line">a = <span class="number">1</span></span><br><span class="line">println(<span class="string">&quot;a: &quot;</span>, a, <span class="string">&quot;,&quot;</span>, typeof(a))   <span class="comment">## Int64 if running on 64-bit CPU, Int32 for 32-bit CPU</span></span><br><span class="line"></span><br><span class="line">aa = <span class="built_in">UInt8</span>(<span class="number">1</span>)     <span class="comment"># method to convert to a specific type</span></span><br><span class="line">println(a == aa)</span><br><span class="line">println(sizeof(a), <span class="string">&quot;, &quot;</span> ,sizeof(aa))</span><br><span class="line"></span><br><span class="line">b = <span class="number">3.2</span></span><br><span class="line">println(<span class="string">&quot;b: &quot;</span>, b, <span class="string">&quot;,&quot;</span>, typeof(b))</span><br><span class="line">println(sizeof(b))</span><br><span class="line"></span><br><span class="line">c = <span class="number">1e18</span></span><br><span class="line">println(<span class="string">&quot;c: &quot;</span>, c, <span class="string">&quot;,&quot;</span>, typeof(c))</span><br><span class="line"></span><br><span class="line">d = <span class="number">0x3f</span></span><br><span class="line">println(<span class="string">&quot;d: &quot;</span>, d, <span class="string">&quot;,&quot;</span>, typeof(d))</span><br><span class="line"></span><br><span class="line">e = <span class="number">0b10</span> </span><br><span class="line">println(<span class="string">&quot;e: &quot;</span>, e, <span class="string">&quot;,&quot;</span>, typeof(e))</span><br><span class="line"></span><br><span class="line">f = <span class="number">0o057</span></span><br><span class="line">println(<span class="string">&quot;f: &quot;</span>, f, <span class="string">&quot;,&quot;</span>, typeof(f))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">g = <span class="string">&#x27;x&#x27;</span></span><br><span class="line">println(<span class="string">&quot;g: &quot;</span>, g, <span class="string">&quot;,&quot;</span>, typeof(g))</span><br><span class="line">println(<span class="string">&quot;g-1: &quot;</span>, g-<span class="number">1</span>, <span class="string">&quot;,&quot;</span>, typeof(g-<span class="number">1</span>))</span><br><span class="line">println(g == <span class="built_in">UInt8</span>(<span class="string">&#x27;x&#x27;</span>))</span><br><span class="line">g= convert( <span class="built_in">UInt8</span>, g)  <span class="comment"># convert function for converting types</span></span><br><span class="line">println(g == <span class="built_in">UInt8</span>(<span class="string">&#x27;x&#x27;</span>))</span><br><span class="line"></span><br><span class="line">h = <span class="number">2</span> + <span class="number">3</span><span class="literal">im</span></span><br><span class="line">println(<span class="string">&quot;h: &quot;</span>, h, <span class="string">&quot;, &quot;</span>, typeof(h))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">i = <span class="number">0.5</span>f</span><br><span class="line">println(<span class="string">&quot;i: &quot;</span>, i, <span class="string">&quot;, &quot;</span>, typeof(i))</span><br><span class="line"></span><br><span class="line">j = <span class="literal">Inf</span> - <span class="literal">Inf</span></span><br><span class="line">println(<span class="string">&quot;j: &quot;</span>, j, <span class="string">&quot;, &quot;</span>, typeof(j))</span><br><span class="line"></span><br><span class="line">k = <span class="literal">Inf</span> * <span class="number">0</span></span><br><span class="line">println(<span class="string">&quot;k: &quot;</span>, k, <span class="string">&quot;, &quot;</span>, typeof(k))</span><br><span class="line"></span><br><span class="line">l = <span class="number">2</span>/<span class="number">0</span></span><br><span class="line">println(<span class="string">&quot;l: &quot;</span>, l, <span class="string">&quot;, &quot;</span>, typeof(l))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">m = <span class="number">6</span>//<span class="number">9</span></span><br><span class="line"></span><br><span class="line">println(<span class="string">&quot;m: &quot;</span>, m, <span class="string">&quot;, &quot;</span>, typeof(m))</span><br><span class="line"></span><br><span class="line">n = bitstring(<span class="number">65535</span>)</span><br><span class="line">println(<span class="string">&quot;n: &quot;</span>, n, <span class="string">&quot;, &quot;</span>, typeof(n))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>Below is the output that I got:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/2d9go0ocsr5zqlz4rj2p.PNG" alt="Alt Text"> </p>
-<p>Official Website:<br><a target="_blank" rel="noopener" href="https://julialang.org/">https://julialang.org/</a></p>
-<p>Cheat sheet:<br><a target="_blank" rel="noopener" href="https://juliadocs.github.io/Julia-Cheat-Sheet/">https://juliadocs.github.io/Julia-Cheat-Sheet/</a><br><a target="_blank" rel="noopener" href="https://juliadocs.github.io/Julia-Cheat-Sheet/zh-cn/">https://juliadocs.github.io/Julia-Cheat-Sheet/zh-cn/</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1046,7 +1052,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
