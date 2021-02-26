@@ -20,22 +20,22 @@
     var CONFIG = {"hostname":"qiuzhaopeng.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="IntroductionWhen I worked on the development of a healthcare device for detecting baby Apnea (pause of breathing), I have spent some time on studying possible technological solutions. I have tried sev">
+  <meta name="description" content="Earlier this year, I have managed the development of a WebApp for industrial supplychain sourcing in our start-up . It’s a typical B&#x2F;S-architecture project whose server side was entirely developed by">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Breathing Detection Using Computer vision with webcam">
-<meta property="og:url" content="http://qiuzhaopeng.github.io/2021/01/18/Breathing-Detection-Using-Computer-vision-with-webcam/index.html">
+<meta property="og:title" content="Testing Web Apps using httpie">
+<meta property="og:url" content="http://qiuzhaopeng.github.io/2021/02/26/Testing-Web-Apps-using-httpie/index.html">
 <meta property="og:site_name" content="Zhaopeng&#39;s Homepage">
-<meta property="og:description" content="IntroductionWhen I worked on the development of a healthcare device for detecting baby Apnea (pause of breathing), I have spent some time on studying possible technological solutions. I have tried sev">
+<meta property="og:description" content="Earlier this year, I have managed the development of a WebApp for industrial supplychain sourcing in our start-up . It’s a typical B&#x2F;S-architecture project whose server side was entirely developed by">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/i/jfa4iwr1jimxi67bjiro.png">
-<meta property="article:published_time" content="2021-01-18T13:07:48.000Z">
-<meta property="article:modified_time" content="2021-01-18T14:29:59.184Z">
+<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/i/b8ng553af9rbp72kngw1.PNG">
+<meta property="article:published_time" content="2021-02-26T09:07:58.000Z">
+<meta property="article:modified_time" content="2021-02-26T09:13:09.731Z">
 <meta property="article:author" content="Zhaopeng QIU">
-<meta property="article:tag" content="CV">
+<meta property="article:tag" content="web">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dev-to-uploads.s3.amazonaws.com/i/jfa4iwr1jimxi67bjiro.png">
+<meta name="twitter:image" content="https://dev-to-uploads.s3.amazonaws.com/i/b8ng553af9rbp72kngw1.PNG">
 
-<link rel="canonical" href="http://qiuzhaopeng.github.io/2021/01/18/Breathing-Detection-Using-Computer-vision-with-webcam/">
+<link rel="canonical" href="http://qiuzhaopeng.github.io/2021/02/26/Testing-Web-Apps-using-httpie/">
 
 
 <script id="page-configurations">
@@ -48,7 +48,7 @@
   };
 </script>
 
-  <title>Breathing Detection Using Computer vision with webcam | Zhaopeng's Homepage</title>
+  <title>Testing Web Apps using httpie | Zhaopeng's Homepage</title>
   
 
 
@@ -162,7 +162,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/01/18/Breathing-Detection-Using-Computer-vision-with-webcam/">
+    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/02/26/Testing-Web-Apps-using-httpie/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/qiu.png">
@@ -175,7 +175,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Breathing Detection Using Computer vision with webcam
+          Testing Web Apps using httpie
         </h1>
 
         <div class="post-meta">
@@ -186,7 +186,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-01-18 14:07:48 / Modified: 15:29:59" itemprop="dateCreated datePublished" datetime="2021-01-18T14:07:48+01:00">2021-01-18</time>
+              <time title="Created: 2021-02-26 10:07:58 / Modified: 10:13:09" itemprop="dateCreated datePublished" datetime="2021-02-26T10:07:58+01:00">2021-02-26</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -194,7 +194,7 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+                  <a href="/categories/IT/" itemprop="url" rel="index"><span itemprop="name">IT</span></a>
                 </span>
             </span>
 
@@ -209,20 +209,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>When I worked on the development of a healthcare device for detecting baby Apnea (pause of breathing), I have spent some time on studying possible technological solutions. I have tried several different types of sensors including: RGB-camera, 3-axis accelerometer, heat camera, depth camera (kinect), etc. The rgb-camera-based solution is very interesting. Firstly because they are low-cost; moreover, it does not require mounting the sensor on baby’s body thus the comfort is guaranteed. That’s why I worked for about 3 weeks on this solution.</p>
-<p>As experiments, I tried multiple possible algorithms including: feature points tracking, inter-frame difference checking, flux, and  color nuance variation tracking. </p>
-<p>In this post, I want to present the latter one. This work is inspired by <a target="_blank" rel="noopener" href="http://people.csail.mit.edu/mrub/vidmag/">this study</a>. The basic idea is to track the color variation of an ROI on human face. The blood circulation and breathing will cause slight color variation of our skin. This change is so slight that our eyes can not perceive it at all. However, a normal webcam can identify color variation with a resolution as high as 2^16 grades. </p>
-<h2 id="ROI-on-human-forehead"><a href="#ROI-on-human-forehead" class="headerlink" title="ROI on human forehead"></a>ROI on human forehead</h2><p>I have chosen a small rectangle area as ROI (region of interest) for tracking color variation. Below is the part of code for this purpose.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">x1 = <span class="number">0.4</span></span><br><span class="line">x2 = <span class="number">0.6</span></span><br><span class="line">y1 = <span class="number">0.1</span></span><br><span class="line">y2 = <span class="number">0.25</span></span><br><span class="line">face_cascade=cv2.CascadeClassifier(cv2.data.haarcascades + <span class="string">&quot;haarcascade_frontalface_default.xml&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getFaceROI</span>(<span class="params">img</span>):</span></span><br><span class="line">    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)</span><br><span class="line">    faces = face_cascade.detectMultiScale(gray, <span class="number">1.2</span>, <span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(faces)&gt;<span class="number">0</span>:</span><br><span class="line">        img=cv2.rectangle(img, (faces[<span class="number">0</span>][<span class="number">0</span>] + <span class="built_in">int</span>(x1*faces[<span class="number">0</span>][<span class="number">2</span>]), faces[<span class="number">0</span>][<span class="number">1</span>]+ <span class="built_in">int</span>(y1*faces[<span class="number">0</span>][<span class="number">3</span>]) ), (faces[<span class="number">0</span>][<span class="number">0</span>]+ <span class="built_in">int</span>(x2*faces[<span class="number">0</span>][<span class="number">2</span>]), faces[<span class="number">0</span>][<span class="number">1</span>]+ <span class="built_in">int</span>(y2*faces[<span class="number">0</span>][<span class="number">3</span>]) ), (<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> [faces[<span class="number">0</span>][<span class="number">0</span>]+<span class="built_in">int</span>(x1*faces[<span class="number">0</span>][<span class="number">2</span>]),  faces[<span class="number">0</span>][<span class="number">1</span>]+ <span class="built_in">int</span>(y1*faces[<span class="number">0</span>][<span class="number">3</span>]),  faces[<span class="number">0</span>][<span class="number">0</span>]+ <span class="built_in">int</span>(x2*faces[<span class="number">0</span>][<span class="number">2</span>]), faces[<span class="number">0</span>][<span class="number">1</span>]+ <span class="built_in">int</span>(y2*faces[<span class="number">0</span>][<span class="number">3</span>])]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>]</span><br></pre></td></tr></table></figure>
-
-<h2 id="Color-Calculation"><a href="#Color-Calculation" class="headerlink" title="Color Calculation"></a>Color Calculation</h2><p>We simply calculate the average value of a given color channel (I used the green channel in my test) of all the pixels in the selected ROI.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getColorAverage</span>(<span class="params">frame, color_id</span>):</span></span><br><span class="line">    <span class="keyword">return</span> frame[:,:,color_id].<span class="built_in">sum</span>()*<span class="number">1.0</span> / (frame.shape[<span class="number">0</span>]*frame.shape[<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
-
-<h2 id="Drawbacks"><a href="#Drawbacks" class="headerlink" title="Drawbacks"></a>Drawbacks</h2><p>Entire code has been uploaded to github repo below:<br><a target="_blank" rel="noopener" href="https://github.com/QiuZhaopeng/CV2_heartbeat_breathing_detection">https://github.com/QiuZhaopeng/CV2_heartbeat_breathing_detection</a></p>
-<p>This solution suffers from limitations in multiple aspects, e.g. the lighting condition, human should stay still, the camera noisy level, etc. That’s why I did not choose this solution for our product (finally we chose the 6-axis sensor solution). </p>
-<h2 id="Result"><a href="#Result" class="headerlink" title="Result"></a>Result</h2><p>Below is the snapshot of the execution of this program. As one can see, there are low-frequency wave shape mixed with high-frequency sawtooth (small peaks).<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/jfa4iwr1jimxi67bjiro.png" alt="Alt Text"><br>I measured my pulses during execution of this program. It can be verified that each small peak corresponds to a pulse beat (heart beat). And the large peak-valley transition corresponds to breathing cycles. </p>
-<p>Anyone interested in this small experiment are encouraged to try it and do some further work. Good luck.</p>
-
+        <p>Earlier this year, I have managed the development of a WebApp for industrial supplychain sourcing in our start-up . It’s a typical B/S-architecture project whose server side was entirely developed by myself (Ubuntu running over AliCloud + Django + Neo4j + MongoDB + Docker + Tomcat + nginx + other dependences).</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/b8ng553af9rbp72kngw1.PNG" alt="Alt Text"></p>
+<p>Below are some notes about a simple tool called <strong>httpie</strong> that I used for testing my APIs. These notes were taken in Chinese, however I add also simple translation in English in case someone happens to read this post and wants to understand it. </p>
+<p>可以使用pip安装(installing using <code>pip</code> with a specified source)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install --upgrade httpie -i http:&#x2F;&#x2F;pypi.douban.com&#x2F;simple --trusted-host pypi.douban.com</span><br></pre></td></tr></table></figure>
+<p>测试get请求(testing a <code>GET</code> request)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http -v GET http:&#x2F;&#x2F;127.0.0.1:8000&#x2F;suppliers_server&#x2F;get_user?username&#x3D;qiu</span><br></pre></td></tr></table></figure>
+<p>测试POST带表单请求(testing a <code>POST</code> request)：<br>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http --form POST http:&#x2F;&#x2F;127.0.0.1:8000&#x2F;suppliers_server&#x2F;query_login username&#x3D;&quot;qiu&quot; password&#x3D;&quot;123456&quot;</span><br></pre></td></tr></table></figure><br>测试get请求带cookie(testing a <code>GET</code> request containing <code>cookie</code>)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http -v GET http:&#x2F;&#x2F;127.0.0.1:8000&#x2F;corporadb&#x2F;login  Cookie:sessionid&#x3D;vc1d2m5kb1zul63l9g24qq5w58vfj35g</span><br></pre></td></tr></table></figure>
+<p>将token包含在header中(testing a <code>GET</code> request containing <code>token</code>)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http -v GET http:&#x2F;&#x2F;127.0.0.1:8000&#x2F;suppliers_server&#x2F;query_chain?product&#x3D;cd Cookie:sessionid&#x3D;y4nokqeymk54tdapicjjkmbve1qfuheo Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InFpdSJ9.qLDaly37vl77SxyHNPEqq6_HKzbSinmPcG9GvGQ-JdQ</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -231,7 +228,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/CV/" rel="tag"># CV</a>
+              <a href="/tags/web/" rel="tag"># web</a>
           </div>
 
         
@@ -240,13 +237,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/01/14/MongoDB-Compass-connection-issue/" rel="prev" title="MongoDB Compass connection issue">
-      <i class="fa fa-chevron-left"></i> MongoDB Compass connection issue
+    <a href="/2021/02/23/Binary-search-algorithm-illustration%EF%BC%882%EF%BC%89/" rel="prev" title="Binary search algorithm illustration（2）">
+      <i class="fa fa-chevron-left"></i> Binary search algorithm illustration（2）
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/02/03/MQTT-communication-via-Cloud-Broker/" rel="next" title="MQTT communication via Cloud Broker">
-      MQTT communication via Cloud Broker <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -305,7 +299,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROI-on-human-forehead"><span class="nav-number">2.</span> <span class="nav-text">ROI on human forehead</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Color-Calculation"><span class="nav-number">3.</span> <span class="nav-text">Color Calculation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Drawbacks"><span class="nav-number">4.</span> <span class="nav-text">Drawbacks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Result"><span class="nav-number">5.</span> <span class="nav-text">Result</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
