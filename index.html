@@ -156,6 +156,126 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/12/31/About-Core-Dump-In-Linux/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qiu.png">
+      <meta itemprop="name" content="Zhaopeng QIU">
+      <meta itemprop="description" content="Stay hungry, stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhaopeng's Homepage">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/31/About-Core-Dump-In-Linux/" class="post-title-link" itemprop="url">About Core Dump in Linux</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-12-31 10:21:54 / Modified: 10:23:26" itemprop="dateCreated datePublished" datetime="2021-12-31T10:21:54+01:00">2021-12-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>##What is core dump</p>
+<p>A core dump is a file of a computer’s documented memory of when a program or computer crashed. The file consists of the recorded status of the working memory at an explicit time, usually close to when the system crashed or when the program ended atypically. So a core dump file is very important for program developers since we often need it to locate and fix crash issues. </p>
+<p>##How to activate “core dump”</p>
+<ol>
+<li><p>Firstly one can type <code>ulimit -c</code> in terminal console, if the output is 0，it means that the “core dump” is deactivated by default. In this case, Linux will not generate core dump file when a program crashes. </p>
+</li>
+<li><p>Then one can activate “core dump” by setting a non-zero size for generated core dump file by executing <code>ulimit -c [kbytes]</code>. For example:</p>
+</li>
+</ol>
+<ul>
+<li><code>ulimit -c 100</code>：set maximum size of core dump file as 100k</li>
+<li><code>ulimit -c unlimited</code>: no size limit of core dump file</li>
+</ul>
+<h2 id="Configuration-of-core-dump"><a href="#Configuration-of-core-dump" class="headerlink" title="Configuration of core dump"></a>Configuration of core dump</h2><p>Once the core dump has been activated, we can get core dump file generated in local  repository. There is still one issue: the core dump file has always the same name as “core” thus it is always over-written if multiple program crashes occur. What if we want to add pid in generated file name, or if we want this file is generated in some other directory?</p>
+<ol>
+<li>core dump filename with process id</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 1 &gt; /proc/sys/kernel/core_uses_pid</span><br></pre></td></tr></table></figure>
+<p>Then process id will be attached in file name.</p>
+<ol start="2">
+<li>One can set the output path and coredump file name pattern by updating sysctl variable “kernel.core_pattern”  in file “/etc/sysctl.conf”</li>
+</ol>
+<p>Add the following phrase at the end of file sysctl.conf:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kernel.core_pattern = /var/core/core_%e_%p</span><br></pre></td></tr></table></figure>
+<p>Save and exit. </p>
+<p>Below are the available options in core_pattern setting:</p>
+<ul>
+<li><strong>%c</strong> maximum size of the generated file</li>
+<li><strong>%e</strong> file name</li>
+<li><strong>%g</strong> group ID of process</li>
+<li><strong>%h</strong> host name</li>
+<li><strong>%p</strong> process ID</li>
+<li><strong>%s</strong> signal which triggered this coredump</li>
+<li><strong>%t</strong> timestamp of this coredump (number of seconds since 1970-01-01)</li>
+<li><strong>%u</strong> user ID of the dumped process</li>
+</ul>
+<p>Once a modification has been made, one can execute the following command to make it take effect:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl –p &#x2F;etc&#x2F;sysctl.conf</span><br></pre></td></tr></table></figure>
+<p>Please note: once we have set /proc/sys/kernel/core_uses_pid as 1，the generated core dump file still has pid in its name even we do not set %p in _core_pattern_.</p>
+<h2 id="Practice"><a href="#Practice" class="headerlink" title="Practice"></a>Practice</h2><p>In this section I present a small practice of coredump. Firstly I performed the following configurations (root privilege might be required) for coredump file generation:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ulimit -c 1000000</span><br><span class="line">ulimit -c</span><br><span class="line">echo 1 &gt; /proc/sys/kernel/core_uses_pid</span><br><span class="line">echo &quot;/tmp/corefile/core-%e-%p-%t&quot; &gt; /proc/sys/kernel/core_pattern</span><br></pre></td></tr></table></figure>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/fnxc6c72rrc0f13omqh6.png" alt="My settings"></p>
+<p>Then let’s write some code to provoke a “Segmentation fault”.  I put the code lines below into file “testSegmtFault.c “.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> IDs[<span class="number">10</span>] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>&#125;;</span><br><span class="line">  <span class="keyword">int</span> * id_ptr = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;0x%lx: %d \n&quot;</span>, (<span class="keyword">unsigned</span> <span class="keyword">long</span>)IDs, *IDs);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// correct logic</span></span><br><span class="line">  <span class="keyword">for</span>  (id_ptr=IDs; id_ptr&lt;=(&amp;IDs[<span class="number">9</span>]); id_ptr++)</span><br><span class="line">  &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;0x%lx: %d \n&quot;</span>, (<span class="keyword">unsigned</span> <span class="keyword">long</span>)id_ptr, *id_ptr);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// bad logic</span></span><br><span class="line">  <span class="keyword">for</span>  (id_ptr=<span class="number">0</span>; id_ptr&lt;=(&amp;IDs[<span class="number">9</span>]); id_ptr++)</span><br><span class="line">  &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;0x%lx: %d \n&quot;</span>, (<span class="keyword">unsigned</span> <span class="keyword">long</span>)id_ptr, *id_ptr);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Compile it then execute the generated executable file:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -g testSegmtFault.c -o seg</span><br><span class="line">./seg</span><br></pre></td></tr></table></figure>
+<p>Execution output is as follows and there is a Segmentation Fault :D:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">qiu@qiu-ThinkCentre-E73:~&#x2F;workspace&#x2F;c_basics&#x2F;linux_flux$ .&#x2F;seg</span><br><span class="line">0x7ffe283297d0: 0 </span><br><span class="line">0x7ffe283297d0: 0 </span><br><span class="line">0x7ffe283297d4: 1 </span><br><span class="line">0x7ffe283297d8: 2 </span><br><span class="line">0x7ffe283297dc: 3 </span><br><span class="line">0x7ffe283297e0: 4 </span><br><span class="line">0x7ffe283297e4: 5 </span><br><span class="line">0x7ffe283297e8: 6 </span><br><span class="line">0x7ffe283297ec: 7 </span><br><span class="line">0x7ffe283297f0: 8 </span><br><span class="line">0x7ffe283297f4: 9 </span><br><span class="line">Segmentation fault</span><br></pre></td></tr></table></figure>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/7rk5c32yodr67el5c9eg.png" alt="Crash occurrence:"></p>
+<p>Now as expected, there is a coredump file named <em>“core-seg-20017-1639863524”</em> generated in <code>/tmp/corefile/</code></p>
+<p>Now let’s use gdb to debug the crash with help of the executable file and the coredump file:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /tmp/corefile</span><br><span class="line">gdb ~/workspace/c_basics/linux_flux/seg core-seg-20017-1639863524</span><br></pre></td></tr></table></figure>
+<p>We can see that gdb immediately shows the defective code line number:<br><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/s3ep8rnnblv409y5hfpb.png" alt="The debug output"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/02/26/Testing-Web-Apps-using-httpie/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -885,98 +1005,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/01/11/A-A-Star-algorithm-for-solving-Sliding-Tiles-Game/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qiu.png">
-      <meta itemprop="name" content="Zhaopeng QIU">
-      <meta itemprop="description" content="Stay hungry, stay foolish">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Zhaopeng's Homepage">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/11/A-A-Star-algorithm-for-solving-Sliding-Tiles-Game/" class="post-title-link" itemprop="url">A* (A-Star) algorithm for solving Sliding Tiles Game</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-11 12:58:45 / Modified: 13:00:20" itemprop="dateCreated datePublished" datetime="2021-01-11T12:58:45+01:00">2021-01-11</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>This weekend I found in my old hard disk a tiny game I wrote years ago. I was learning motion planning algorithms in that period, thus this game was one exercise of mine for testing the <strong>A* search algorithm</strong> (see <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/A*_search_algorithm">introduction</a>). This algorithm is a very traditional one thus I will not present it in my post. One who is interested can read [this book] (<a target="_blank" rel="noopener" href="http://lavalle.pl/planning/">http://lavalle.pl/planning/</a>) By Steven M. LaValle for details. </p>
-<h2 id="Number-tiles-Game-in-Visual-Studio"><a href="#Number-tiles-Game-in-Visual-Studio" class="headerlink" title="Number tiles Game in Visual Studio"></a>Number tiles Game in Visual Studio</h2><p>I developed the sliding number tiles game (shown below) as a small desktop software using Visual Studio.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/l9iasejgl73xuj6bxkt7.PNG" alt="Alt Text"></p>
-<p>This video shows how I solve the game manually (I am not quite good at it):</p>
-<div class="video-container"><iframe src="https://www.youtube.com/embed/kU1aec4fqfc" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
-
-<h2 id="Solving-it-using-A"><a href="#Solving-it-using-A" class="headerlink" title="Solving it using A*"></a>Solving it using A*</h2><p>Now I touch “S”-key of my keyboard, and the A* algorithm starts to solve the puzzle (search a path). And I push “S”-key again, it starts to show the solution.</p>
-<div class="video-container"><iframe src="https://www.youtube.com/embed/tsv5wD8s2Ks" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
-
-<p>The code has been pushed to <a target="_blank" rel="noopener" href="https://github.com/jemaloQ/astar_search_game.git">this repo</a>. </p>
-<p>Below are simple explanations of the algorithm in this example.</p>
-<h2 id="Algorithm-explanation"><a href="#Algorithm-explanation" class="headerlink" title="Algorithm explanation"></a>Algorithm explanation</h2><h3 id="Node-and-graph"><a href="#Node-and-graph" class="headerlink" title="Node and graph"></a>Node and graph</h3><p>Each configuration of this game corresponds to a node in its state graph as shown below. So in order to solve this game, we need to find a path that links node start to node target via a sequence of intermediate nodes.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/z65q1qk594ahgpippp6a.PNG" alt="Alt Text"></p>
-<h3 id="Assumptions"><a href="#Assumptions" class="headerlink" title="Assumptions"></a>Assumptions</h3><p>We assure that the <strong>assumptions</strong> are satisfied in this example: </p>
-<ol>
-<li>there are limited number of states; </li>
-<li>there is a valid heuristic function for assessing the distance between nodes: sum of distance (in number of moves) for each tile from its current position to its target position</li>
-</ol>
-<h3 id="Some-conceptions"><a href="#Some-conceptions" class="headerlink" title="Some conceptions:"></a>Some conceptions:</h3><p><strong>Closed set</strong>: a set of nodes that has been assessed<br><strong>Frontier set</strong>: a set of nodes that are about to be explored</p>
-<h3 id="StateNode-class"><a href="#StateNode-class" class="headerlink" title="StateNode class"></a>StateNode class</h3><p>Each state node object in the code has value members:<br><strong>parent</strong>: a node from which current node comes with one move<br><strong>g</strong>: path cost from <strong>start</strong> node to current node<br><strong>h</strong>: distance cost from current node to <strong>target</strong> node<br><strong>isExpanded</strong>: a flag noting if all neighbors of this node are in <strong>Closed set</strong></p>
-<h3 id="Algorithm-pseudo-code-details"><a href="#Algorithm-pseudo-code-details" class="headerlink" title="Algorithm pseudo-code details:"></a>Algorithm pseudo-code details:</h3><p><strong>Init</strong>: put start node into closed set and frontier set</p>
-<p><strong>Explore_node</strong> for a given node:</p>
-<p>I have developed the core function of this algorithm <em>explore_Tree</em>(<strong>n_i</strong>) and it do the following works in a recursive way:<br>    (1) for each neighbor nodes <strong>n_k</strong> of node <strong>n_i</strong>, check firstly if <strong>n_k</strong> is already included in closed set.<br>    (2) If we get YES for step 1, and if current cost of <strong>n_k</strong> (namely: <strong>g+h</strong>) is lower than its cost in the <strong>closed set</strong>, update its cost and update its parent as <strong>n_i</strong>;<br>    (3) If we get NO for step 1: put current node <strong>n_k</strong> into <strong>frontier</strong> and <strong>closed set</strong>, calculate its cost, define <strong>n_k</strong>‘s parent as <strong>n_i</strong><br>    (4) delete <strong>n_i</strong> from <strong>frontier set</strong><br>    (5) check if any node in <strong>frontier</strong> has reached target node<br>    (6) if target reached, return True<br>    (7) if target not yet reached, select <strong>node of the lowest cost from frontier set</strong>, and call function <em>explore_Tree()</em> for it.</p>
-<p>If <strong>Explore_node</strong> finally returns True, it means that the optimal path is found. We can then retrieve the path by tracking recursively the parent, starting from the target node.</p>
-<h3 id="Illustration"><a href="#Illustration" class="headerlink" title="Illustration"></a>Illustration</h3><p>The following image shows the first step of this algorithm: exploring neighbors of the start node and assessing the cost of each node.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/mo16qo6j52ir6n6d0gpn.PNG" alt="Alt Text"></p>
-<p>Following the step shown above, the image below shows the how A* explores recursively the “optimal” move. In this step, it locates the lowest-cost node in frontier then explores its neighbors and assesses their cost. </p>
-<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/2fj62u79o04fh8g64pxh.PNG" alt="Alt Text"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1048,20 +1076,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
