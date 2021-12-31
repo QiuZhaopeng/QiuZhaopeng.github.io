@@ -181,7 +181,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-12-31 10:21:54 / Modified: 10:23:26" itemprop="dateCreated datePublished" datetime="2021-12-31T10:21:54+01:00">2021-12-31</time>
+              <time title="Created: 2021-12-31 10:21:54 / Modified: 10:33:49" itemprop="dateCreated datePublished" datetime="2021-12-31T10:21:54+01:00">2021-12-31</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -204,10 +204,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>##What is core dump</p>
-<p>A core dump is a file of a computer’s documented memory of when a program or computer crashed. The file consists of the recorded status of the working memory at an explicit time, usually close to when the system crashed or when the program ended atypically. So a core dump file is very important for program developers since we often need it to locate and fix crash issues. </p>
-<p>##How to activate “core dump”</p>
-<ol>
+          <h2 id="What-is-core-dump"><a href="#What-is-core-dump" class="headerlink" title="What is core dump"></a>What is core dump</h2><p>A core dump is a file of a computer’s documented memory of when a program or computer crashed. The file consists of the recorded status of the working memory at an explicit time, usually close to when the system crashed or when the program ended atypically. So a core dump file is very important for program developers since we often need it to locate and fix crash issues. </p>
+<h2 id="How-to-activate-“core-dump”"><a href="#How-to-activate-“core-dump”" class="headerlink" title="How to activate “core dump”"></a>How to activate “core dump”</h2><ol>
 <li><p>Firstly one can type <code>ulimit -c</code> in terminal console, if the output is 0，it means that the “core dump” is deactivated by default. In this case, Linux will not generate core dump file when a program crashes. </p>
 </li>
 <li><p>Then one can activate “core dump” by setting a non-zero size for generated core dump file by executing <code>ulimit -c [kbytes]</code>. For example:</p>
