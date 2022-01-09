@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"qiuzhaopeng.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Last year， I have used Netlink in my development work for collecting some events from kernel space. I present in this post some basic practice I have done when I learnt to program with Netlink. Introd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Netlink Communication between Kernel and User space">
+<meta property="og:url" content="http://qiuzhaopeng.github.io/2022/01/09/Netlink-Communication-between-Kernel-and-User-space/index.html">
+<meta property="og:site_name" content="Zhaopeng&#39;s Homepage">
+<meta property="og:description" content="Last year， I have used Netlink in my development work for collecting some events from kernel space. I present in this post some basic practice I have done when I learnt to program with Netlink. Introd">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/swlujhqpxn2x9fz4gm0w.png">
+<meta property="article:published_time" content="2022-01-09T15:48:02.000Z">
+<meta property="article:modified_time" content="2022-01-09T15:05:30.036Z">
+<meta property="article:author" content="Zhaopeng QIU">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/swlujhqpxn2x9fz4gm0w.png">
+
+<link rel="canonical" href="http://qiuzhaopeng.github.io/2022/01/09/Netlink-Communication-between-Kernel-and-User-space/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Netlink Communication between Kernel and User space | Zhaopeng's Homepage</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Zhaopeng's Homepage</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">My tech notebook</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+
+  <a href="https://github.com/QiuZhaopeng" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2022/01/09/Netlink-Communication-between-Kernel-and-User-space/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qiu.png">
+      <meta itemprop="name" content="Zhaopeng QIU">
+      <meta itemprop="description" content="Stay hungry, stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhaopeng's Homepage">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Netlink Communication between Kernel and User space
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-01-09 16:48:02 / Modified: 16:05:30" itemprop="dateCreated datePublished" datetime="2022-01-09T16:48:02+01:00">2022-01-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index"><span itemprop="name">IT</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Last year， I have used <strong>Netlink</strong> in my development work for collecting some events from kernel space. I present in this post some basic practice I have done when I learnt to program with <strong>Netlink</strong>.</p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><strong>Netlink</strong> is a Linux kernel interface used for** inter-process communication (IPC)** between both the kernel and userspace processes, and between different userspace processes, in a way similar to the <strong>Unix domain sockets</strong>. Similarly to the Unix domain sockets, and unlike <strong>INET</strong> sockets, Netlink communication cannot traverse host boundaries. <strong>Netlink</strong> provides a standard socket-based interface for userspace processes, and a kernel-side API for internal use by kernel modules. Originally, <strong>Netlink</strong> used the <strong>AF_NETLINK</strong> socket family. <strong>Netlink</strong> is designed to be a more flexible successor to <strong>ioctl</strong>; RFC 3549 describes the protocol in detail. </p>
+<h2 id="My-practice"><a href="#My-practice" class="headerlink" title="My practice"></a>My practice</h2><h4 id="Kernel-module"><a href="#Kernel-module" class="headerlink" title="Kernel module"></a>Kernel module</h4><p>Below is the content of my source file “netlink_kernel.c” which yields a kernel module. There is macro <code>MY_NETLINK 30</code> which defines my customized netlink protocol. One can also choose available protocols such like <strong>NETLINK_ROUTE</strong> or <strong>NETLINK_INET_DIAG</strong>. All available protocols can be seen in <a target="_blank" rel="noopener" href="https://elixir.bootlin.com/linux/v5.15.13/source/include/uapi/linux/netlink.h">this page</a>. Function <strong>netlink_kernel_create()</strong> creates a netlink socket for user space application to communicate with. More information about netlink programming can found <a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man7/netlink.7.html">here</a>.</p>
+<p>netlink_kernel.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;net/sock.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/netlink.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/skbuff.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  refer to https://elixir.bootlin.com/linux/v5.15.13/source/include/linux/netlink.h</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MY_NETLINK 30  <span class="comment">// cannot be larger than 31, otherwise we shall get &quot;insmod: ERROR: could not insert module netlink_kernel.ko: No child processes&quot;</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sock</span> *<span class="title">nl_sk</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">myNetLink_recv_msg</span><span class="params">(struct sk_buff *skb)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">nlmsghdr</span> *<span class="title">nlhead</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">sk_buff</span> *<span class="title">skb_out</span>;</span></span><br><span class="line">	<span class="keyword">int</span> pid, res, msg_size;</span><br><span class="line">	<span class="keyword">char</span> *msg = <span class="string">&quot;Hello msg from kernel&quot;</span>;</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line">	printk(KERN_INFO <span class="string">&quot;Entering: %s\n&quot;</span>, __FUNCTION__);</span><br><span class="line"></span><br><span class="line">	msg_size = <span class="built_in">strlen</span>(msg);</span><br><span class="line"></span><br><span class="line">	nlhead = (struct nlmsghdr*)skb-&gt;data;    <span class="comment">//nlhead message comes from skb&#x27;s data... (sk_buff: unsigned char *data)</span></span><br><span class="line"></span><br><span class="line">	printk(KERN_INFO <span class="string">&quot;MyNetlink has received: %s\n&quot;</span>,(<span class="keyword">char</span>*)nlmsg_data(nlhead));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	pid = nlhead-&gt;nlmsg_pid; <span class="comment">// Sending process port ID, will send new message back to the &#x27;user space sender&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	skb_out = nlmsg_new(msg_size, <span class="number">0</span>);    <span class="comment">//nlmsg_new - Allocate a new netlink message: skb_out</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span>(!skb_out)</span><br><span class="line">	&#123;</span><br><span class="line">		printk(KERN_ERR <span class="string">&quot;Failed to allocate new skb\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	nlhead = nlmsg_put(skb_out, <span class="number">0</span>, <span class="number">0</span>, NLMSG_DONE, msg_size, <span class="number">0</span>);   <span class="comment">// Add a new netlink message to an skb</span></span><br><span class="line">	</span><br><span class="line">	NETLINK_CB(skb_out).dst_group = <span class="number">0</span>;                  </span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">	<span class="built_in">strncpy</span>(nlmsg_data(nlhead), msg, msg_size); <span class="comment">//char *strncpy(char *dest, const char *src, size_t count)</span></span><br><span class="line"></span><br><span class="line">	res = nlmsg_unicast(nl_sk, skb_out, pid); </span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span>(res &lt; <span class="number">0</span>)</span><br><span class="line">		printk(KERN_INFO <span class="string">&quot;Error while sending back to user\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> __init <span class="title">myNetLink_init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">netlink_kernel_cfg</span> <span class="title">cfg</span> =</span> &#123;</span><br><span class="line">		.input = myNetLink_recv_msg,</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">       <span class="comment">/*netlink_kernel_create() returns a pointer, should be checked with == NULL */</span></span><br><span class="line">	nl_sk = netlink_kernel_create(&amp;init_net, MY_NETLINK, &amp;cfg);</span><br><span class="line">	printk(<span class="string">&quot;Entering: %s, protocol family = %d \n&quot;</span>,__FUNCTION__, MY_NETLINK);</span><br><span class="line">	<span class="keyword">if</span>(!nl_sk)</span><br><span class="line">	&#123;</span><br><span class="line">		printk(KERN_ALERT <span class="string">&quot;Error creating socket.\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-10</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    printk(<span class="string">&quot;MyNetLink Init OK!\n&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> __exit <span class="title">myNetLink_exit</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	printk(KERN_INFO <span class="string">&quot;exiting myNetLink module\n&quot;</span>);</span><br><span class="line">	netlink_kernel_release(nl_sk);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(myNetLink_init);</span><br><span class="line">module_exit(myNetLink_exit);</span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h4 id="User-space-application"><a href="#User-space-application" class="headerlink" title="User space application"></a>User space application</h4><p>Below are the content of my file “netlink_client.c”. This program shall open a netlink socket with the same protocol and allow user to send/receive msg to/from kernel module in previous section.</p>
+<p>netlink_client.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;asm/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/netlink.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NETLINK_USER 30 <span class="comment">// same customized protocol as in my kernel module</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_PAYLOAD 1024 <span class="comment">// maximum payload size</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_nl</span> <span class="title">src_addr</span>, <span class="title">dest_addr</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">nlmsghdr</span> *<span class="title">nlh</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">nlmsghdr</span> *<span class="title">nlh2</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">msghdr</span> <span class="title">msg</span>, <span class="title">resp</span>;</span>  <span class="comment">// famous struct msghdr, it includes &quot;struct iovec *   msg_iov;&quot;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">iovec</span> <span class="title">iov</span>, <span class="title">iov2</span>;</span></span><br><span class="line"><span class="keyword">int</span> sock_fd;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> args, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//int socket(int domain, int type, int protocol);</span></span><br><span class="line">    sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER); <span class="comment">//NETLINK_KOBJECT_UEVENT	</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(sock_fd &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">memset</span>(&amp;src_addr, <span class="number">0</span>, <span class="keyword">sizeof</span>(src_addr));</span><br><span class="line">    src_addr.nl_family = AF_NETLINK;</span><br><span class="line">    src_addr.nl_pid = getpid(); <span class="comment">/* self pid */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);</span></span><br><span class="line">    <span class="keyword">if</span>(bind(sock_fd, (struct sockaddr*)&amp;src_addr, <span class="keyword">sizeof</span>(src_addr)))&#123;</span><br><span class="line">        perror(<span class="string">&quot;bind() error\n&quot;</span>);</span><br><span class="line">        close(sock_fd);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">memset</span>(&amp;dest_addr, <span class="number">0</span>, <span class="keyword">sizeof</span>(dest_addr));</span><br><span class="line">    dest_addr.nl_family = AF_NETLINK;</span><br><span class="line">    dest_addr.nl_pid = <span class="number">0</span>;       <span class="comment">/* For Linux Kernel */</span></span><br><span class="line">    dest_addr.nl_groups = <span class="number">0</span>;    <span class="comment">/* unicast */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//nlh: contains &quot;Hello&quot; msg</span></span><br><span class="line">    nlh = (struct nlmsghdr *)<span class="built_in">malloc</span>(NLMSG_SPACE(MAX_PAYLOAD));</span><br><span class="line">    <span class="built_in">memset</span>(nlh, <span class="number">0</span>, NLMSG_SPACE(MAX_PAYLOAD));</span><br><span class="line">    nlh-&gt;nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);</span><br><span class="line">    nlh-&gt;nlmsg_pid = getpid();  <span class="comment">//self pid</span></span><br><span class="line">    nlh-&gt;nlmsg_flags = <span class="number">0</span>; </span><br><span class="line"></span><br><span class="line">    <span class="comment">//nlh2: contains received msg</span></span><br><span class="line">    nlh2 = (struct nlmsghdr *)<span class="built_in">malloc</span>(NLMSG_SPACE(MAX_PAYLOAD));</span><br><span class="line">    <span class="built_in">memset</span>(nlh2, <span class="number">0</span>, NLMSG_SPACE(MAX_PAYLOAD));</span><br><span class="line">    nlh2-&gt;nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);</span><br><span class="line">    nlh2-&gt;nlmsg_pid = getpid();  <span class="comment">//self pid</span></span><br><span class="line">    nlh2-&gt;nlmsg_flags = <span class="number">0</span>; </span><br><span class="line"></span><br><span class="line">    <span class="built_in">strcpy</span>(NLMSG_DATA(nlh), <span class="string">&quot;Hello this is a msg from userspace&quot;</span>);   <span class="comment">//put &quot;Hello&quot; msg into nlh</span></span><br><span class="line"></span><br><span class="line">    iov.iov_base = (<span class="keyword">void</span> *)nlh;         <span class="comment">//iov -&gt; nlh</span></span><br><span class="line">    iov.iov_len = nlh-&gt;nlmsg_len;</span><br><span class="line">    msg.msg_name = (<span class="keyword">void</span> *)&amp;dest_addr;  <span class="comment">//msg_name is Socket name: dest</span></span><br><span class="line">    msg.msg_namelen = <span class="keyword">sizeof</span>(dest_addr);</span><br><span class="line">    msg.msg_iov = &amp;iov;                 <span class="comment">//msg -&gt; iov</span></span><br><span class="line">    msg.msg_iovlen = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    iov2.iov_base = (<span class="keyword">void</span> *)nlh2;         <span class="comment">//iov -&gt; nlh2</span></span><br><span class="line">    iov2.iov_len = nlh2-&gt;nlmsg_len;</span><br><span class="line">    resp.msg_name = (<span class="keyword">void</span> *)&amp;dest_addr;  <span class="comment">//msg_name is Socket name: dest</span></span><br><span class="line">    resp.msg_namelen = <span class="keyword">sizeof</span>(dest_addr);</span><br><span class="line">    resp.msg_iov = &amp;iov2;                 <span class="comment">//resp -&gt; iov</span></span><br><span class="line">    resp.msg_iovlen = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Sending message to kernel\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ret = sendmsg(sock_fd, &amp;msg, <span class="number">0</span>);   </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;send ret: %d\n&quot;</span>, ret); </span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Waiting for message from kernel\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Read message from kernel */</span></span><br><span class="line">    recvmsg(sock_fd, &amp;resp, <span class="number">0</span>);  <span class="comment">//msg is also receiver for read</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Received message payload: %s\n&quot;</span>, (<span class="keyword">char</span> *) NLMSG_DATA(nlh2));  </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">char</span> usermsg[MAX_PAYLOAD];</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;Input your msg for sending to kernel: &quot;</span>);</span><br><span class="line">    	<span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>, usermsg);</span><br><span class="line">    </span><br><span class="line">    	<span class="built_in">strcpy</span>(NLMSG_DATA(nlh), usermsg);   <span class="comment">//put &quot;Hello&quot; msg into nlh</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    	<span class="built_in">printf</span>(<span class="string">&quot;Sending message \&quot; %s \&quot; to kernel\n&quot;</span>, usermsg);</span><br><span class="line"></span><br><span class="line">    	ret = sendmsg(sock_fd, &amp;msg, <span class="number">0</span>);   </span><br><span class="line">    	<span class="built_in">printf</span>(<span class="string">&quot;send ret: %d\n&quot;</span>, ret); </span><br><span class="line"></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Waiting for message from kernel\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Read message from kernel */</span></span><br><span class="line">	recvmsg(sock_fd, &amp;resp, <span class="number">0</span>);  <span class="comment">//msg is also receiver for read</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;Received message payload: %s\n&quot;</span>, (<span class="keyword">char</span> *)NLMSG_DATA(nlh2));   </span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">    close(sock_fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>Makefile</p>
+<p>Create a Makefile with the following content which will enable us to easily compile the source files.</p>
+<p>Makefile</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">obj-m += netlink_kernel.o</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">generate the path</span></span><br><span class="line">CURRENT_PATH:=$(shell pwd)</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">the current kernel version number</span></span><br><span class="line">LINUX_KERNEL:=$(shell uname -r)</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">the absolute path</span></span><br><span class="line">LINUX_KERNEL_PATH:=/usr/src/linux-headers-$(LINUX_KERNEL)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">complie object</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   extension of <span class="string">&quot;make modules&quot;</span> cmd with -C option and <span class="string">&quot;M=dir&quot;</span> configuration</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   this cmd will switch working directory to the given path followed by the -C option</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   and will search specified <span class="built_in">source</span> files from the given path configured by <span class="string">&quot;M=&quot;</span></span> </span><br><span class="line"><span class="meta">#</span><span class="bash">   and compile them to generate ko files</span></span><br><span class="line"></span><br><span class="line">all:</span><br><span class="line">	@echo $(LINUX_KERNEL_PATH)</span><br><span class="line">	make -C $(LINUX_KERNEL_PATH) M=$(CURRENT_PATH) modules</span><br><span class="line"></span><br><span class="line">client:</span><br><span class="line">	gcc netlink_client.c -o netlink_client -g</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">clean</span></span><br><span class="line">clean:</span><br><span class="line">	make -C $(LINUX_KERNEL_PATH) M=$(CURRENT_PATH) clean</span><br><span class="line">	rm netlink_client</span><br></pre></td></tr></table></figure>
+
+<h4 id="Test-the-communication"><a href="#Test-the-communication" class="headerlink" title="Test the communication"></a>Test the communication</h4><p>Make sure that files “netlink_kernel.c”, “netlink_client.c” and “Makefile” are in the same directory. In a Linux terminal window, <code>cd</code> into this directory and start the compilation:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make </span><br><span class="line">make client</span><br></pre></td></tr></table></figure>
+<p>Normally kernel module file “netlink_kernel.ko” and user application file “netlink_client” will be generated.</p>
+<p>Load the generated kernel module “netlink_kernel.ko” to linux kernel:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo insmod netlink_kernel.ko</span><br></pre></td></tr></table></figure>
+<p>Execute in a new terminal the following cmd to monitor the kernel messages:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dmesg -Hw</span><br></pre></td></tr></table></figure>
+<p>Now start the user application to start the communication:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;netlink_client</span><br></pre></td></tr></table></figure>
+<p>Below is the screenshot of my test:<br><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/swlujhqpxn2x9fz4gm0w.png" alt="Image description"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/12/31/About-Core-Dump-In-Linux/" rel="prev" title="About Core Dump in Linux">
+      <i class="fa fa-chevron-left"></i> About Core Dump in Linux
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#My-practice"><span class="nav-number">2.</span> <span class="nav-text">My practice</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Kernel-module"><span class="nav-number">2.0.1.</span> <span class="nav-text">Kernel module</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#User-space-application"><span class="nav-number">2.0.2.</span> <span class="nav-text">User space application</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Test-the-communication"><span class="nav-number">2.0.3.</span> <span class="nav-text">Test the communication</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zhaopeng QIU"
+      src="/images/qiu.png">
+  <p class="site-author-name" itemprop="name">Zhaopeng QIU</p>
+  <div class="site-description" itemprop="description">Stay hungry, stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhaopeng QIU</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
