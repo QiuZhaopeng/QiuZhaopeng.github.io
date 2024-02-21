@@ -156,86 +156,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2024/02/04/Mobile-robot-tele-operation-using-ROS2-and-ros2-canopen/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qiu.png">
-      <meta itemprop="name" content="Zhaopeng QIU">
-      <meta itemprop="description" content="Stay hungry, stay foolish">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Zhaopeng's Homepage">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/02/04/Mobile-robot-tele-operation-using-ROS2-and-ros2-canopen/" class="post-title-link" itemprop="url">Mobile robot tele-operation using ROS2 and ros2_canopen</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2024-02-04 22:31:33" itemprop="dateCreated datePublished" datetime="2024-02-04T22:31:33+01:00">2024-02-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-02-05 01:16:37" itemprop="dateModified" datetime="2024-02-05T01:16:37+01:00">2024-02-05</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="New-task"><a href="#New-task" class="headerlink" title="New task"></a>New task</h2><p>Recently, I have been assigned a new task to enable teleopration of a mini mobile robot, which has 2 motorized wheels (Maxon Epos4 motor) and some caster wheels. In the past months, some colleagues have already installed ROS2 (humble) in the on-board computer, git cloned <a target="_blank" rel="noopener" href="https://github.com/ros-industrial/ros2_canopen">ros2_canopen</a> stack, and tried controlling the robot with “diff_drive_controller” as per the example “Pilz manipulator PRBT 6” in the <a target="_blank" rel="noopener" href="https://ros-industrial.github.io/ros2_canopen/manual/rolling/">official documentation of ros2_canopen</a>. Unable to make the robot move with the entire implementation, they thus requested me to continue this work.  </p>
-<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/fp4fswekgr3pghr5oqhi.png" alt="Image description"></p>
-<h2 id="Single-motor-debug"><a href="#Single-motor-debug" class="headerlink" title="Single motor debug"></a>Single motor debug</h2><p>I started this task by firstly reading the documentation of <strong>ros2_canopen</strong>. To be honest,  their documentation is not so reader-friendly. I thus had to read at times the source code to understand some of its concepts, the global structure and some parameter/configurations of this framwork. </p>
-<p>Then, I created a package <strong>single_epos4_canopen</strong> for controling one single Epos4 motor using <strong>ros2_canopen</strong> by following this <a target="_blank" rel="noopener" href="https://ros-industrial.github.io/ros2_canopen/manual/rolling/application/trinamic.html">Trinamic Stepper Motor control example</a>. Reasons for doing this: this simple package does not depend on high-level features such like <strong>ros2_control</strong> and <strong>robot description</strong>, thus I can focus on the debugging of low-level things such as the CAN communication. </p>
-<p>With “single_epos4_canopen” launched, though <code>ros2 service call /maxon_epos4/init std_srvs/srv/Trigger</code> fails, <code>ros2 service call /maxon_epos4/target canopen_interfaces/srv/COTargetDouble &quot;&#123; target: 10.0 &#125;&quot;</code> service can successfully make the wheel rotate in high speed (because our default operation mode is “velocity mode”). Yo ho! This at lease proves that the CAN network is fine. I called <code>ros2 service call /maxon_epos4/halt std_srvs/srv/Trigger</code> to successfully stop the motion. Similarly I can call <code>nmt_state_reset</code> service to restart the NMT of the node whose Heartbeat is configured to be sent every 1000ms. </p>
-<h3 id="CanOpen-frames-analysis"><a href="#CanOpen-frames-analysis" class="headerlink" title="CanOpen frames analysis"></a>CanOpen frames analysis</h3><p>Thanks to the <strong>single_epos4_canopen</strong> package, I can monitor and analyze the CanOpen frames by calling</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">candump can0 </span><br></pre></td></tr></table></figure>
-<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/uaq1f28tc7axv4zlurl4.jpg" alt="Image description"></p>
-<p>By testing nodes 0x0A and 0x0B respectively with “single_epos4_canopen”, I found that both nodes have the same <strong>RxPDO1</strong> Cob-ID as 0x220. WTF…. In the dcf files of the 2 motors, I found that all their PDOs have the same Cob-IDs (0x320, 0x420, 0x520, 0x200, 0x300, etc). So I re-checked and re-configured the ODs using <strong>Maxon Epos Studio</strong>. PDOs have been updated as per Cia 402 standard (e.g  <code>0x20A/0x20B</code>, <code>0x30A/0x30B</code>, <code>0x40A/40B</code> and <code>0x50A/50B</code> for RxPDOs,  <code>0x18A/0x18B</code>, <code>0x28A/0x28B</code>, <code>0x38A/0x38B</code> and <code>0x48A/0x48B</code> for TxPDOs).</p>
-<h2 id="use-ros2-control-within-ros2-canopen"><a href="#use-ros2-control-within-ros2-canopen" class="headerlink" title="use ros2_control within ros2_canopen"></a>use ros2_control within ros2_canopen</h2><p>By following <a target="_blank" rel="noopener" href="https://ros-industrial.github.io/ros2_canopen/manual/rolling/application/prbt_robot.html">this example</a>, I created the package for controlling both motors with help of <em>diff_drive_controller</em> in <strong>ros2_control</strong>. After having been struggling with the configurations and tests for days, and with help of some workaround to make <code>handleInit()</code> run without error, finally I can control the robot with joystick:</p>
-<div class="video-container"><iframe src="https://www.youtube.com/embed/Nnp8hqz4kdc" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
-
-<h2 id="Simulation"><a href="#Simulation" class="headerlink" title="Simulation"></a>Simulation</h2><p>Afterward, I spent 2 more days to update the robot description file, added some <strong>gazebo</strong> control and sensor plugins and make the simulated bot tele-operable in <strong>Gazebo</strong> simulator via “teleop_twist_keyboard”:</p>
-<div class="video-container"><iframe src="https://www.youtube.com/embed/EFiaWs7ZUYU" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
-
-<h2 id="Future-work"><a href="#Future-work" class="headerlink" title="Future work"></a>Future work</h2><p>For some reason, this project has been paused, though I would like to continue to achieve autonomous navigation and fleet control on this robot. Probably there will be no more updates about future developments :(</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2024/01/21/How-to-become-an-excellent-robotics-software-engineer/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1030,6 +950,81 @@
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/01/14/MongoDB-Compass-connection-issue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qiu.png">
+      <meta itemprop="name" content="Zhaopeng QIU">
+      <meta itemprop="description" content="Stay hungry, stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhaopeng's Homepage">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/14/MongoDB-Compass-connection-issue/" class="post-title-link" itemprop="url">MongoDB Compass connection issue</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-14 12:27:03 / Modified: 12:33:28" itemprop="dateCreated datePublished" datetime="2021-01-14T12:27:03+01:00">2021-01-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index"><span itemprop="name">IT</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>I am working on migration of our <em>Data Warehouse</em> project from <em>Alibaba Cloud</em> to <em>Huawei Cloud</em> this week. All goes well, except one issue occurs when I tried to connect to <strong>MongoDB</strong> using <strong>MongoDB Compass Community</strong>. </p>
+<p>As I have presented in my <a target="_blank" rel="noopener" href="https://dev.to/jemaloqiu/install-mongodb-with-docker-in-ubuntu-18-04-4pbi">previous post</a>, I have deployed <strong>MongoDB</strong> service using <strong>docker</strong> and I have successfully connected to my <strong>MongoDB</strong> database from <strong>IPython</strong> console. So I firstly tried again the visit from <strong>IPython</strong> today to make sure that the <strong>MongoDB</strong> service is still running on Huawei ECS. It IS still working well:</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/inkrwaealqvcv183n10a.png" alt="Alt Text"></p>
+<p>Then I open <strong>MongoDB Compass Community</strong> and fill the login information as below (our domain name has not yet been authorized so I have to use Ip address for <em>hostname</em>):<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/e2uyrzwtepgxxkaao9q8.png" alt="Alt Text"><br>However, when I click “CONNECT” button, nothing happens.</p>
+<p>After a close investigation, I found the reason. After I filled all the fields for connection, <strong>Compass</strong> yielded a connection URI string as below.<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/iwfcg0mb6hebayyq9lhe.png" alt="Alt Text"></p>
+<p>In fact, as explained in official manual of <strong>MongoDB</strong>, the standard URI syntax for connection is as:<br><code>mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]</code>.<br>Thus in my case, <strong>MongoDB Compass</strong> has strangely used <code>ip:port</code> as the Database name to visit. Since there is no database with such name, so it shall do nothing and stays in the connection interface.</p>
+<p>Now I correct the URI string manually and fill my database name <em>suppliers</em> into this string as below:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/1wez341jzvar701lbflr.png" alt="Alt Text"></p>
+<p>Once I click “CONNECT”, <strong>Compass</strong> jumps as expected to display interface of the queried database now:<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/6s8udjmskichqb0ay5id.png" alt="Alt Text"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
@@ -1101,7 +1096,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1114,7 +1109,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
