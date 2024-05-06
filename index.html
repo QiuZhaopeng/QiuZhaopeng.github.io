@@ -233,6 +233,86 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2024/02/04/Mobile-robot-tele-operation-using-ROS2-and-ros2-canopen/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qiu.png">
+      <meta itemprop="name" content="Zhaopeng QIU">
+      <meta itemprop="description" content="Stay hungry, stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhaopeng's Homepage">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/02/04/Mobile-robot-tele-operation-using-ROS2-and-ros2-canopen/" class="post-title-link" itemprop="url">Mobile robot tele-operation using ROS2 and ros2_canopen</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-02-04 22:31:33" itemprop="dateCreated datePublished" datetime="2024-02-04T22:31:33+01:00">2024-02-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-02-21 15:40:35" itemprop="dateModified" datetime="2024-02-21T15:40:35+01:00">2024-02-21</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="New-task"><a href="#New-task" class="headerlink" title="New task"></a>New task</h2><p>Recently, I was assigned a new task: to enable teleoperation for a compact mobile robot. This little bot boasts two motorized wheels (equipped with Maxon EPOS4 motors) and a set of caster wheels. In the preceding months, my colleagues have installed ROS2 (Humble) on the robot’s onboard computer. They also git cloned the <a target="_blank" rel="noopener" href="https://github.com/ros-industrial/ros2_canopen">ros2_canopen</a> stack and attempted to control the robot using the “diff_drive_controller” — following the example “Pilz Manipulator PRBT 6” in the <a target="_blank" rel="noopener" href="https://ros-industrial.github.io/ros2_canopen/manual/rolling/">official documentation of ros2_canopen</a>. Despite their efforts, the robot remained stubbornly stationary.</p>
+<p>Then, the torch has been passed to me. I’ve been asked to continue this work, unravel the mystery, and breathe life into our mini mobile marvel. Let’s get those wheels turning!</p>
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/fp4fswekgr3pghr5oqhi.png" alt="Image description"></p>
+<h2 id="Navigating-the-ROS2-CANopen-Maze-Debugging-Low-Level-Robot-Control"><a href="#Navigating-the-ROS2-CANopen-Maze-Debugging-Low-Level-Robot-Control" class="headerlink" title="Navigating the ROS2_CANopen Maze: Debugging Low-Level Robot Control"></a>Navigating the ROS2_CANopen Maze: Debugging Low-Level Robot Control</h2><p>Embarking on this task, I delved into the <strong>ros2_canopen</strong> documentation. Candidly, it wasn’t the most user-friendly read. Consequently, I found myself occasionally spelunking through the source code to grasp its concepts, overall structure, and various parameter configurations.</p>
+<p>Next, I created a package called <strong>single_epos4_canopen</strong> — a modest creation aimed at controlling a solitary Epos4 motor using <strong>ros2_canopen</strong>. My inspiration? Well, this lightweight package sidesteps high-level features like <strong>ros2_control</strong> and <strong>robot description</strong>. Instead, it zeroes in on the nitty-gritty: CAN communication debugging.</p>
+<p>With <strong>single_epos4_canopen</strong> in action, I managed to make wheel rotate by calling <code>ros2 service call /single_motor/target canopen_interfaces/srv/COTargetDouble “&#123; target: 10.0 &#125;”</code> service (thanks to our default “velocity mode”). Ahoy, success! This, at least, confirms that our CAN network is fine.</p>
+<p>And when it’s time to halt the motion, <code>ros2 service call /single_motor/halt std_srvs/srv/Trigger</code> does the trick. Similarly I can call <code>nmt_state_reset</code> service to restart the NMT of the node whose Heartbeat is configured to be sent every 1000ms. </p>
+<h3 id="CanOpen-frames-analysis"><a href="#CanOpen-frames-analysis" class="headerlink" title="CanOpen frames analysis"></a>CanOpen frames analysis</h3><p>Thanks to the <strong>single_epos4_canopen</strong> package, I can monitor and analyze the CanOpen frames by calling</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">candump can0 </span><br></pre></td></tr></table></figure>
+<p>(sorry I cannot share the images).</p>
+<p>By conducting tests on respectively </p>
+<h2 id="Use-ros2-control-with-ros2-canopen"><a href="#Use-ros2-control-with-ros2-canopen" class="headerlink" title="Use ros2_control with ros2_canopen"></a>Use ros2_control with ros2_canopen</h2><p>By following <a target="_blank" rel="noopener" href="https://ros-industrial.github.io/ros2_canopen/manual/rolling/application/prbt_robot.html">this example</a>, I created the package for controlling both motors with help of <em>diff_drive_controller</em> in <strong>ros2_control</strong>. After having been struggling with the configurations and tests for multiple days, and by making some workaround to fix errors in some function for handling init, finally I can control the robot with joystick (sorry I cannot share the video).</p>
+<h2 id="Simulation"><a href="#Simulation" class="headerlink" title="Simulation"></a>Simulation</h2><p>Afterward, I spent 2 more days to update the robot description file, added some <strong>gazebo</strong> control and sensor plugins and make the simulated bot tele-operable in <strong>Gazebo</strong> simulator via “teleop_twist_keyboard”:</p>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/EFiaWs7ZUYU" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
+
+<h2 id="Future-work"><a href="#Future-work" class="headerlink" title="Future work"></a>Future work</h2><p>For some reason, this project has been paused, though I would like to continue to achieve autonomous navigation and fleet control on this robot. Probably there will be no more updates about future developments :(</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2024/01/21/How-to-become-an-excellent-robotics-software-engineer/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -947,86 +1027,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://qiuzhaopeng.github.io/2021/01/18/Breathing-Detection-Using-Computer-vision-with-webcam/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qiu.png">
-      <meta itemprop="name" content="Zhaopeng QIU">
-      <meta itemprop="description" content="Stay hungry, stay foolish">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Zhaopeng's Homepage">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/18/Breathing-Detection-Using-Computer-vision-with-webcam/" class="post-title-link" itemprop="url">Breathing Detection Using Computer vision with webcam</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-18 14:07:48 / Modified: 15:29:59" itemprop="dateCreated datePublished" datetime="2021-01-18T14:07:48+01:00">2021-01-18</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>When I worked on the development of a healthcare device for detecting baby Apnea (pause of breathing), I have spent some time on studying possible technological solutions. I have tried several different types of sensors including: RGB-camera, 3-axis accelerometer, heat camera, depth camera (kinect), etc. The rgb-camera-based solution is very interesting. Firstly because they are low-cost; moreover, it does not require mounting the sensor on baby’s body thus the comfort is guaranteed. That’s why I worked for about 3 weeks on this solution.</p>
-<p>As experiments, I tried multiple possible algorithms including: feature points tracking, inter-frame difference checking, flux, and  color nuance variation tracking. </p>
-<p>In this post, I want to present the latter one. This work is inspired by <a target="_blank" rel="noopener" href="http://people.csail.mit.edu/mrub/vidmag/">this study</a>. The basic idea is to track the color variation of an ROI on human face. The blood circulation and breathing will cause slight color variation of our skin. This change is so slight that our eyes can not perceive it at all. However, a normal webcam can identify color variation with a resolution as high as 2^16 grades. </p>
-<h2 id="ROI-on-human-forehead"><a href="#ROI-on-human-forehead" class="headerlink" title="ROI on human forehead"></a>ROI on human forehead</h2><p>I have chosen a small rectangle area as ROI (region of interest) for tracking color variation. Below is the part of code for this purpose.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">x1 = <span class="number">0.4</span></span><br><span class="line">x2 = <span class="number">0.6</span></span><br><span class="line">y1 = <span class="number">0.1</span></span><br><span class="line">y2 = <span class="number">0.25</span></span><br><span class="line">face_cascade=cv2.CascadeClassifier(cv2.data.haarcascades + <span class="string">&quot;haarcascade_frontalface_default.xml&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getFaceROI</span>(<span class="params">img</span>):</span></span><br><span class="line">    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)</span><br><span class="line">    faces = face_cascade.detectMultiScale(gray, <span class="number">1.2</span>, <span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(faces)&gt;<span class="number">0</span>:</span><br><span class="line">        img=cv2.rectangle(img, (faces[<span class="number">0</span>][<span class="number">0</span>] + <span class="built_in">int</span>(x1*faces[<span class="number">0</span>][<span class="number">2</span>]), faces[<span class="number">0</span>][<span class="number">1</span>]+ <span class="built_in">int</span>(y1*faces[<span class="number">0</span>][<span class="number">3</span>]) ), (faces[<span class="number">0</span>][<span class="number">0</span>]+ <span class="built_in">int</span>(x2*faces[<span class="number">0</span>][<span class="number">2</span>]), faces[<span class="number">0</span>][<span class="number">1</span>]+ <span class="built_in">int</span>(y2*faces[<span class="number">0</span>][<span class="number">3</span>]) ), (<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> [faces[<span class="number">0</span>][<span class="number">0</span>]+<span class="built_in">int</span>(x1*faces[<span class="number">0</span>][<span class="number">2</span>]),  faces[<span class="number">0</span>][<span class="number">1</span>]+ <span class="built_in">int</span>(y1*faces[<span class="number">0</span>][<span class="number">3</span>]),  faces[<span class="number">0</span>][<span class="number">0</span>]+ <span class="built_in">int</span>(x2*faces[<span class="number">0</span>][<span class="number">2</span>]), faces[<span class="number">0</span>][<span class="number">1</span>]+ <span class="built_in">int</span>(y2*faces[<span class="number">0</span>][<span class="number">3</span>])]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>]</span><br></pre></td></tr></table></figure>
-
-<h2 id="Color-Calculation"><a href="#Color-Calculation" class="headerlink" title="Color Calculation"></a>Color Calculation</h2><p>We simply calculate the average value of a given color channel (I used the green channel in my test) of all the pixels in the selected ROI.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getColorAverage</span>(<span class="params">frame, color_id</span>):</span></span><br><span class="line">    <span class="keyword">return</span> frame[:,:,color_id].<span class="built_in">sum</span>()*<span class="number">1.0</span> / (frame.shape[<span class="number">0</span>]*frame.shape[<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
-
-<h2 id="Drawbacks"><a href="#Drawbacks" class="headerlink" title="Drawbacks"></a>Drawbacks</h2><p>Entire code has been uploaded to github repo below:<br><a target="_blank" rel="noopener" href="https://github.com/QiuZhaopeng/CV2_heartbeat_breathing_detection">https://github.com/QiuZhaopeng/CV2_heartbeat_breathing_detection</a></p>
-<p>This solution suffers from limitations in multiple aspects, e.g. the lighting condition, human should stay still, the camera noisy level, etc. That’s why I did not choose this solution for our product (finally we chose the 6-axis sensor solution). </p>
-<h2 id="Result"><a href="#Result" class="headerlink" title="Result"></a>Result</h2><p>Below is the snapshot of the execution of this program. As one can see, there are low-frequency wave shape mixed with high-frequency sawtooth (small peaks).<br><img src="https://dev-to-uploads.s3.amazonaws.com/i/jfa4iwr1jimxi67bjiro.png" alt="Alt Text"><br>I measured my pulses during execution of this program. It can be verified that each small peak corresponds to a pulse beat (heart beat). And the large peak-valley transition corresponds to breathing cycles. </p>
-<p>Anyone interested in this small experiment are encouraged to try it and do some further work. Good luck.</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1098,7 +1098,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">20</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1111,7 +1111,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
